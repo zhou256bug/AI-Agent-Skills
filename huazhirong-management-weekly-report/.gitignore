@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+# 本地产物（MD/PDF/xlsx/状态默认落在 output/），不入库
+output/
+*.pdf
+.DS_Store
+# 本地凭据，绝不入库
+local/credentials.env
