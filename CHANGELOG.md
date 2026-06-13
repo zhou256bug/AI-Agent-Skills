@@ -10,6 +10,7 @@
 
 ### Added
 
+- 仓库根专业 `README.md`(技能一览 / 注册快速开始 / 技能开发规范 / 安全与凭据)
 - 根级 `CHANGELOG.md`
 - 规范化技能 `cross-cultural-consultant`(提升至仓库根,与 `aliyun-enterprise-mail` 同级):
   - 平台注册脚手架 `agents/{openclaw,hermes,openai}.yaml`、`bundles/cross-cultural-consultant.hermes.yaml`、`references/openclaw-hermes-registration.md`
@@ -21,6 +22,10 @@
   - 手机 PDF 统一走 skill 内 `scripts/render_mobile_pdf.py`(移除 `$HERMES_HOME/tools/...` 依赖),PDF 标注为可选依赖
   - 归档输出路径由 `newpos/...` 改为可配置的 `output/...`(operative 段落)
   - 版本号对齐为 0.7.1
+
+### Fixed
+
+- `aliyun-enterprise-mail` 注册文档与 `agents/*.yaml` 仓库名 `AI-Skills` → `AI-Agent-Skills`
 
 ### Removed
 
