@@ -1,0 +1,35 @@
+# Hermes Agent 注册片段
+# 文档：https://hermes-agent.nousresearch.com/docs/user-guide/features/skills
+
+display_name: "Management Weekly Report"
+skill_name: huazhirong-management-weekly-report
+slash_command: /weekly-report
+
+# 复制到 ~/.hermes/config.yaml 的 skills 段
+hermes_config_yaml: |
+  skills:
+    external_dirs:
+      - ~/Projects/AI-Agent-Skills
+
+# 可选：通过环境变量覆盖默认配置（发件人/老板/公司/归档目录）
+env_overrides: |
+  export WEEKLY_REPORT_OWNER=老板
+  export WEEKLY_REPORT_SENDER_EMAIL=evyn.chen@newpostech.com
+  export WEEKLY_REPORT_ARCHIVE_DIR=~/reports/weekly
+
+bundle_file: bundles/weekly-report.hermes.yaml
+
+agent_instruction: |
+  加载 huazhirong-management-weekly-report 后：
+  1. 按 SKILL.md 流程：取邮件(配置发件人/主题) → 解析 xlsx → 四段 Markdown → validate → 渲染 → 投递
+  2. 命名 W{N}-日期，期号取自邮件主题括号，禁止 ISO 周；不单设「老板本周重点」段
+  3. 渲染为可选依赖(weasyprint/ghostscript/PyMuPDF)，缺失则交付 Markdown
+  4. 自检：python3 scripts/run_acceptance.py
+
+cli_template: |
+  python3 {skill_dir}/scripts/weekly_report_config.py
+  python3 {skill_dir}/scripts/run_acceptance.py
+
+install_local: |
+  ln -sf ~/Projects/AI-Agent-Skills/huazhirong-management-weekly-report \
+    ~/.hermes/skills/huazhirong-management-weekly-report

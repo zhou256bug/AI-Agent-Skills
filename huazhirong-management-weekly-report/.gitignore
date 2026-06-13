@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+# 本地产物（MD/PDF 归档默认落在 output/），不入库
+output/
+*.pdf
+.DS_Store

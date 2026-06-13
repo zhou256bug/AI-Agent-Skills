@@ -1,0 +1,9 @@
+name: weekly-report
+description: 管理团队周报汇编：各部门经理周报邮件 → 四段长条 PDF
+skills:
+  - huazhirong-management-weekly-report
+instruction: |
+  使用 huazhirong-management-weekly-report 处理管理团队周报。
+  流程：取邮件(配置发件人/主题) → 解析 xlsx → 四段 Markdown(重点项目进展/海外市场要闻/业务线重点关注/需老板关注的事项)
+  → validate → 可选渲染手机长条 PDF → 可选多通道投递。
+  命名 W{N}-日期，期号取自邮件主题括号，禁止 ISO 周；不单设「老板本周重点」段。

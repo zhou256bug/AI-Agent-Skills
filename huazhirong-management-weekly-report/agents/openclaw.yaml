@@ -1,0 +1,44 @@
+# OpenClaw 注册片段
+# 文档：https://docs.openclaw.ai/tools/skills-config
+
+display_name: "Management Weekly Report"
+skill_name: huazhirong-management-weekly-report
+skill_key: huazhirong-management-weekly-report
+
+# 复制到 ~/.openclaw/openclaw.json（JSON5，按你的路径改 extraDirs）
+openclaw_json: |
+  {
+    skills: {
+      load: {
+        extraDirs: ["~/Projects/AI-Agent-Skills"],
+        watch: true,
+        watchDebounceMs: 250,
+      },
+      entries: {
+        "huazhirong-management-weekly-report": {
+          enabled: true,
+          // 可选：覆盖默认配置（不写则用 scripts/weekly_report_config.py 默认值）
+          env: {
+            // WEEKLY_REPORT_OWNER: "老板",
+            // WEEKLY_REPORT_SENDER_EMAIL: "evyn.chen@newpostech.com",
+            // WEEKLY_REPORT_ARCHIVE_DIR: "~/reports/weekly",
+          },
+        },
+      },
+    },
+  }
+
+install_notes: |
+  方式 A（推荐 monorepo）：
+    git clone https://github.com/zhou256bug/AI-Agent-Skills.git ~/Projects/AI-Agent-Skills
+    在 openclaw.json 配置 skills.load.extraDirs 指向该目录
+  方式 B（仅安装本 skill 目录）：
+    openclaw skills install ./huazhirong-management-weekly-report --as huazhirong-management-weekly-report
+
+agent_instruction: |
+  加载后：取邮件(配置发件人) → 解析 xlsx(跳过 周报汇总链接/错误档案/Sheet1) → 四段 Markdown
+  → validate_weekly_report_md.py → 可选 render_mobile_pdf.py → 可选 deliver.py。
+  命名 W{N}-日期，禁止 ISO 周；不单设「老板本周重点」段。
+
+cli_template: |
+  python3 {skill_dir}/scripts/run_acceptance.py
