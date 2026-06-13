@@ -1,0 +1,125 @@
+{
+  "version": "0.7.1",
+  "description": "跨文化管理顾问 — 中国管理者出国全程伴侣(出国前/出国中/回国后)",
+  "data_snapshot": "2026-05-30",
+  "knowledge_sources": [
+    "港大 EMBA6611 跨文化管理(张轶文教授)",
+    "Hofstede 六维度(119 国,The Culture Factor)",
+    "Kluckhohn 价值取向六维度",
+    "Hall 高/低语境沟通理论"
+  ],
+  "evals": [
+    {
+      "name": "A-出国前-日本画像",
+      "input": "下周我要去日本拜访客户,先给我一个完整的文化画像",
+      "expected_mode": "A",
+      "expected": "A 模式完整报告:中国对照 Delta + 沟通密码 + 中国人最易踩的 3 个坑 + checklist + 框架点睛",
+      "must_have": ["中国 vs 日本", "Delta", "踩坑", "checklist", "框架"],
+      "loads_module": "modules/before-travel.md"
+    },
+    {
+      "name": "A-出国前-墨西哥画像",
+      "input": "下个月去墨西哥出差",
+      "expected_mode": "A",
+      "expected": "A 模式完整报告 + 家庭文化提醒 + 框架十二警示",
+      "must_have": ["原生家庭", "周会", "框架十二"],
+      "loads_module": "modules/before-travel.md"
+    },
+    {
+      "name": "B1-餐桌-日本饭局",
+      "input": "今晚请日本客户吃饭,带他吃什么、喝什么酒、聊什么话题?",
+      "expected_mode": "B1",
+      "expected": "餐桌场景:选什么+喝什么+聊什么+加分动作+接力问句",
+      "must_have": ["选什么", "喝什么", "聊什么", "禁忌", "还有其他场景"],
+      "loads_module": "modules/during-dining.md"
+    },
+    {
+      "name": "B1-餐桌-德国宴请",
+      "input": "明天带德国客户吃饭,我应该选哪种餐厅、点什么菜?",
+      "expected_mode": "B1",
+      "expected": "餐桌场景:餐厅类型+禁忌+加分动作",
+      "must_have": ["餐厅", "禁忌", "还有其他场景"],
+      "loads_module": "modules/during-dining.md"
+    },
+    {
+      "name": "B2-谈判-德国合同",
+      "input": "我和德国客户谈价格,他们特别坚持合同条款,我该怎么回应?",
+      "expected_mode": "B2",
+      "expected": "谈判场景:现在怎么办+三条原则+话术+框架依据",
+      "must_have": ["现在怎么办", "话术", "[F", "还有其他场景"],
+      "loads_module": "modules/during-negotiation.md"
+    },
+    {
+      "name": "B2-谈判-饭后推进",
+      "input": "饭桌上聊得很 high,接下来合同应该怎么推进?",
+      "expected_mode": "B2",
+      "expected": "谈判场景:节奏判断+话术+踩坑提醒",
+      "must_have": ["现在怎么办", "三条原则", "节奏"],
+      "loads_module": "modules/during-negotiation.md"
+    },
+    {
+      "name": "B3-送礼-日本伴手礼",
+      "input": "我下周去日本,带什么伴手礼合适?预算 500-1000 人民币",
+      "expected_mode": "B3",
+      "expected": "送礼场景:3 选+禁忌+怎么送",
+      "must_have": ["推荐", "千万别送", "怎么送"],
+      "loads_module": "modules/during-gifting.md"
+    },
+    {
+      "name": "B4-实时-日本沉默",
+      "input": "日本客户刚说'我们考虑一下',然后沉默了 30 秒,我该怎么办?",
+      "expected_mode": "B4",
+      "expected": "实时解读:真实意思+应该回+节奏+不要做",
+      "must_have": ["真实意思", "应该回", "不要做"],
+      "loads_module": "modules/during-meeting.md"
+    },
+    {
+      "name": "B5-突发-说错话",
+      "input": "我刚跟印度客户聊到了印巴关系,气氛突然冷下来,怎么救?",
+      "expected_mode": "B5",
+      "expected": "突发救场:立刻做+化解话术+之后避免+是否升级",
+      "must_have": ["现在立刻做", "化解", "是否需要升级"],
+      "loads_module": "modules/during-crisis.md"
+    },
+    {
+      "name": "D-复盘-日本谈崩",
+      "input": "我刚从日本回来,这次没谈成,客户最后说'我们再研究',然后就没下文了",
+      "expected_mode": "D",
+      "expected": "复盘:两阶段——先问引导问题,信息够后再分析",
+      "must_have": ["引导问题", "你描述的事实", "文化解释", "下次"],
+      "loads_module": "modules/after-trip.md"
+    },
+    {
+      "name": "C-战略-沙特建团队",
+      "input": "我们计划在沙特建本地团队,外派和本地雇佣怎么组合?",
+      "expected_mode": "A+战略",
+      "expected": "A 模式完整 + 战略管理警示板块",
+      "must_have": ["战略", "外派 vs 本地", "沙化率"],
+      "loads_module": "modules/before-travel.md"
+    },
+    {
+      "name": "对比-墨西哥法国",
+      "input": "帮我对比墨西哥和法国,我作为中国管理者最容易踩的坑",
+      "expected_mode": "compare",
+      "expected": "多国表格(含中国列)+ 最需要注意的 3 件事 + 验证钩子",
+      "must_have": ["中国", "对比表格", "3 件事"],
+      "loads_module": "直接走 SKILL.md 第五节"
+    },
+    {
+      "name": "澄清-信息不足",
+      "input": "我准备出海,先给建议",
+      "expected_mode": "clarify",
+      "expected": "4 个最小澄清问题,不直接答",
+      "must_have": ["目标国家", "互动对象", "当前阶段", "你的目标"],
+      "loads_module": "直接走 SKILL.md 第六节"
+    },
+    {
+      "name": "兜底-尼泊尔",
+      "input": "我想了解尼泊尔团队管理风格",
+      "expected_mode": "fallback",
+      "expected": "明确数据缺失维度 + N/A 标注 + 定性建议(基于已有维度+Kluckhohn)",
+      "must_have": ["数据缺失", "N/A", "定性"],
+      "loads_module": "走 SKILL.md 第七节"
+    }
+  ]
+}

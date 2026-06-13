@@ -1,0 +1,38 @@
+# Hermes Agent 注册片段
+# 文档：https://hermes-agent.nousresearch.com/docs/user-guide/features/skills
+
+display_name: "Cross-Cultural Consultant"
+skill_name: cross-cultural-consultant
+slash_command: /cross-cultural-consultant
+
+# 复制到 ~/.hermes/config.yaml 的 skills 段
+hermes_config_yaml: |
+  skills:
+    external_dirs:
+      # 指向 AI-Agent-Skills 仓库根目录（扫描其下所有 */SKILL.md）
+      - ~/Projects/AI-Agent-Skills
+
+# 对话式使用（Hermes 自动加载 SKILL.md 并按触发词路由 module）
+hermes_cli: |
+  hermes chat --toolsets terminal,skills -q "下周去日本拜访客户，给我完整文化画像"
+
+# 推荐：用 bundle 把跨文化相关 instruction 打包成 slash 命令
+bundle_file: bundles/cross-cultural-consultant.hermes.yaml
+
+agent_instruction: |
+  加载 cross-cultural-consultant 后：
+  1. 先读 SKILL.md「三、场景路由表」，按触发词只加载对应 module（渐进式加载）
+  2. 任何国别分析必须读取 data/hofstede-dimensions.json，并给出中国基线 Delta
+  3. null 维度标 N/A，不编造；至少 2 类 [D]/[F]/[C] 证据标签
+  4. 手机 PDF（§十三）走 scripts/render_mobile_pdf.py，需可选依赖 weasyprint/ghostscript/PyMuPDF
+  5. 输出不含 /Users/... 等本地绝对路径
+
+cli_template: |
+  python3 {skill_dir}/scripts/validate-data.py
+  python3 {skill_dir}/evaluation/run_evals.py
+
+# 仅本 skill 目录拷贝/软链到 Hermes 本地 skills 时：
+install_local: |
+  mkdir -p ~/.hermes/skills
+  ln -sf ~/Projects/AI-Agent-Skills/cross-cultural-consultant \
+    ~/.hermes/skills/cross-cultural-consultant
