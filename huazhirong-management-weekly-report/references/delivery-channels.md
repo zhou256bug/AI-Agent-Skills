@@ -1,15 +1,21 @@
 # 投递通道（多通道，可扩展）
 
-投递是**可选的平台胶水层**,与周报核心(取邮件→四段→PDF)解耦。统一入口 `scripts/deliver.py`。
+统一入口 `scripts/deliver.py`,返回结构化结果 `{ok, retryable, channel, detail}`,供编排器判定续跑。
 
-| 通道 | `--channel` | 机制 | 依赖 |
-|------|-------------|------|------|
-| 微信(Hermes 桥接) | `wechat-media` | 输出单独一行 `MEDIA:<绝对路径>`,Hermes→微信桥据此附带 PDF | 无 |
-| 企业微信 | `wecom` | 群机器人 webhook 发文本通知 | 环境变量 `WECOM_WEBHOOK_URL` |
-| 飞书 | `feishu` | 自定义机器人 webhook 发文本通知 | 环境变量 `FEISHU_WEBHOOK_URL` |
+| 通道 | `--channel` | 机制 | 回执 | 依赖 |
+|------|-------------|------|------|------|
+| **微信 bridge(自动化默认)** | `wechat-bridge` | 直连 hermes-weixin `POST /send` | **有**:HTTP 200=成功 / 500/超时=可重试(含限流) | `WEIXIN_BRIDGE_URL`(默认 `http://localhost:9100`)+ `WEIXIN_TO` |
+| 微信(回复桥接,交互兜底) | `wechat-media` | 输出 `MEDIA:<绝对路径>` 行,Agent 回复→网关代发 | **无** | 无 |
+| 企业微信 | `wecom` | 群机器人 webhook 文本通知 | HTTP 200/非200 | `WECOM_WEBHOOK_URL` |
+| 飞书 | `feishu` | 自定义机器人 webhook 文本通知 | HTTP 200/非200 | `FEISHU_WEBHOOK_URL` |
+
+> **为何默认 `wechat-bridge`**:据官方插件源码(`src/bot.ts` /send 返回 200/500、`src/api/api.ts` 非 2xx 抛错),直连 bridge 能拿到**真实成功/失败**,限流表现为可重试失败 → 编排器据此 `DELIVER_RETRY` 续跑。`wechat-media` 走 Agent 回复代发,**拿不到回执**,仅适合人对话兜底。
 
 ```bash
-# 微信（默认）：最终回复必须含 MEDIA: 行，否则微信只收到文字、不附 PDF
+# 微信 bridge（默认，有回执）
+python3 scripts/deliver.py --channel wechat-bridge --file output/W23-2026年06月08日.pdf   # 需 WEIXIN_TO
+
+# 交互兜底：输出 MEDIA: 行（无回执）
 python3 scripts/deliver.py --channel wechat-media --file output/W23-2026年06月08日.pdf
 
 # 企业微信 / 飞书：先配 webhook，再发（--dry-run 可预览不联网）

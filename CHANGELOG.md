@@ -15,10 +15,12 @@
 - 规范化技能 `cross-cultural-consultant`(提升至仓库根,与 `aliyun-enterprise-mail` 同级):
   - 平台注册脚手架 `agents/{openclaw,hermes,openai}.yaml`、`bundles/cross-cultural-consultant.hermes.yaml`、`references/openclaw-hermes-registration.md`
   - `.gitignore`、技能级 `CHANGELOG.md`、`evaluation/run_evals.py`(纯标准库自检 harness)
-- 规范化技能 `huazhirong-management-weekly-report`(提升至仓库根):
-  - vendored `scripts/render_mobile_pdf.py`(技能自带渲染器,独立可跑)、`scripts/weekly_report_config.py`(发件人/老板/公司/归档可配置,环境变量覆盖)
-  - `scripts/deliver.py` 多通道投递(`wechat-media` / `wecom` / `feishu`,可扩展)
-  - 平台脚手架 `agents/{openclaw,hermes,openai}.yaml`、`bundles/weekly-report.hermes.yaml`、`references/openclaw-hermes-registration.md`、`references/delivery-channels.md`、`.gitignore`、技能级 `CHANGELOG.md`
+- 规范化技能 `huazhirong-management-weekly-report`(提升至仓库根,独立完整):
+  - vendored `scripts/render_mobile_pdf.py`(技能自带渲染器,独立可跑)、`scripts/weekly_report_config.py`(发件人/老板/公司/归档/IMAP/WEIXIN 可配置,环境变量覆盖)
+  - **内置取信** `scripts/fetch_mail.py`(必备,通用 IMAP,纯标准库),不再依赖 aliyun/平台工具
+  - **断点续跑编排** `scripts/run_weekly.py` + `scripts/state.py`:一条命令 fetch→compose→render→deliver,失败按期号续跑(取信成功跳取信、限流仅补推送、幂等)
+  - `scripts/deliver.py` 多通道投递,新增 `wechat-bridge`(直连 hermes-weixin `POST /send` 读 200/500 真实回执,默认),另有 `wechat-media`/`wecom`/`feishu`
+  - 凭据 `credentials.env.example` + `local/`(gitignore);平台脚手架 `agents/{openclaw,hermes,openai}.yaml`、`bundles/weekly-report.hermes.yaml`、`references/{openclaw-hermes-registration,delivery-channels}.md`、`.gitignore`、技能级 `CHANGELOG.md`
 
 ### Changed
 

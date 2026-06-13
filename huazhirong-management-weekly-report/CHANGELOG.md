@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added（独立完整化：内置取信 + 断点续跑编排）
+
+- `scripts/fetch_mail.py`:**必备**取信(通用 IMAP,纯标准库),`SINCE` + 发件人/主题过滤 + 递归取 xlsx
+- `scripts/run_weekly.py`:一条命令编排 fetch→compose→render→deliver,**失败断点续跑**(状态 `STATE:DELIVERED/ALREADY_DONE/NEED_COMPOSE/FETCH_WAIT/DELIVER_RETRY/FAIL_NOTIFY`)
+- `scripts/state.py`:按期号 N 的状态文件 + 产物探测(fetch/compose/render/deliver)
+- `deliver.py` 新增 `wechat-bridge` 通道:直连 hermes-weixin `POST /send`,**读 200/500 真实回执**(限流=可重试),自动化默认
+- 凭据 `credentials.env.example` + `local/`(gitignore):IMAP + WEIXIN 配置
+- `weekly_report_config.py` 扩展 IMAP/WEIXIN 配置 + `local/credentials.env` 加载器
+- `run_acceptance.py` 增取信纯函数 + 状态机/续跑用例(取信续跑、限流仅补推送、幂等、NEED_COMPOSE)
+
+### Notes（取信设计）
+
+- 取信不再依赖 `aliyun-enterprise-mail` 或平台工具,技能自给自足(任意 IMAP)
+- 微信投递默认走 bridge 直连以获取回执;`wechat-media`(MEDIA 行,无回执)仅作交互兜底
+
 首个规范化(平台解耦、可独立跑通)版本,目标 1.0.0。
 
 ### Added
