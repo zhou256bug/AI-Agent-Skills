@@ -15,6 +15,10 @@
 - 规范化技能 `cross-cultural-consultant`(提升至仓库根,与 `aliyun-enterprise-mail` 同级):
   - 平台注册脚手架 `agents/{openclaw,hermes,openai}.yaml`、`bundles/cross-cultural-consultant.hermes.yaml`、`references/openclaw-hermes-registration.md`
   - `.gitignore`、技能级 `CHANGELOG.md`、`evaluation/run_evals.py`(纯标准库自检 harness)
+- 规范化技能 `huazhirong-management-weekly-report`(提升至仓库根):
+  - vendored `scripts/render_mobile_pdf.py`(技能自带渲染器,独立可跑)、`scripts/weekly_report_config.py`(发件人/老板/公司/归档可配置,环境变量覆盖)
+  - `scripts/deliver.py` 多通道投递(`wechat-media` / `wecom` / `feishu`,可扩展)
+  - 平台脚手架 `agents/{openclaw,hermes,openai}.yaml`、`bundles/weekly-report.hermes.yaml`、`references/openclaw-hermes-registration.md`、`references/delivery-channels.md`、`.gitignore`、技能级 `CHANGELOG.md`
 
 ### Changed
 
@@ -22,6 +26,10 @@
   - 手机 PDF 统一走 skill 内 `scripts/render_mobile_pdf.py`(移除 `$HERMES_HOME/tools/...` 依赖),PDF 标注为可选依赖
   - 归档输出路径由 `newpos/...` 改为可配置的 `output/...`(operative 段落)
   - 版本号对齐为 0.7.1
+- `huazhirong-management-weekly-report` 平台解耦并参数化:
+  - `run_acceptance.py` 重写为平台无关、可独立跑通(25 用例;render 在缺可选依赖时自动 SKIP),移除对 `$HERMES_HOME`/cron gate/iCloud 金标准的依赖
+  - validator/transform/paths 参数化(老板/发件人/归档默认值不变,兼容历史「菜头」字样)
+  - cron/门禁降为可选运维层(`references/cron-retry.md`);推送改为多通道投递层;归档默认 `output/`
 
 ### Fixed
 
@@ -34,8 +42,9 @@
 
 ### Notes
 
-- `migration/` 保留原始迁移素材;`huazhirong-business-support` 与 `huazhirong-management-weekly-report` 因强耦合,待单独讨论后再规范化
+- `migration/` 保留原始迁移素材;`huazhirong-business-support` 因强耦合,待单独讨论后再规范化
 - `cross-cultural-consultant` 中涉及特定同事/公司语境(菜头、emma/大为 委派、newpos/Obsidian)的案例参考文件本轮未改,留待后续讨论
+- `huazhirong-management-weekly-report` 的 `PROJECT_SOURCES`(项目→周报负责人)为华智融默认业务数据,可按需替换
 
 ## [0.0.0]
 
