@@ -45,6 +45,10 @@ def deliver_wechat_bridge(file: Path, title: str, text: str, dry_run: bool) -> d
     if not cfg.WEIXIN_TO:
         return {"ok": False, "retryable": False, "channel": "wechat-bridge",
                 "detail": "缺少 WEIXIN_TO（收件人 user_id）"}
+    # 发送前校验文件存在且非空（bridge 以其自身文件系统解析 media_path，须可读）
+    if not dry_run and (not file.exists() or file.stat().st_size == 0):
+        return {"ok": False, "retryable": False, "channel": "wechat-bridge",
+                "detail": f"文件不存在或为空（bridge 需能读到该路径）：{file}"}
     payload = {"to": cfg.WEIXIN_TO, "content": text or title, "media_path": str(file.resolve())}
     if cfg.WEIXIN_ACCOUNT_ID:
         payload["account_id"] = cfg.WEIXIN_ACCOUNT_ID

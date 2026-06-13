@@ -14,13 +14,16 @@
 from __future__ import annotations
 
 import email
+import http.server
 import importlib.util
 import io
+import json
 import os
 import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 from contextlib import redirect_stdout
 from email.message import EmailMessage
 from pathlib import Path
@@ -304,6 +307,54 @@ def main() -> int:
         os.environ.pop("WEEKLY_REPORT_ARCHIVE_DIR", None)
     else:
         os.environ["WEEKLY_REPORT_ARCHIVE_DIR"] = _saved_env
+
+    # ---- 微信 bridge 发文件契约（mock bridge，无需真实微信）----
+    deliver_mod = _load("wr_deliver", "deliver.py")
+    captured: dict = {}
+
+    class _Handler(http.server.BaseHTTPRequestHandler):
+        def log_message(self, *a):  # 静音
+            pass
+
+        def do_POST(self):
+            ln = int(self.headers.get("Content-Length", 0))
+            captured["body"] = json.loads(self.rfile.read(ln).decode("utf-8"))
+            code = 500 if getattr(self.server, "fail500", False) else 200
+            payload = b'{"ok": true}' if code == 200 else b'{"ok": false}'
+            self.send_response(code)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+
+    srv = http.server.HTTPServer(("127.0.0.1", 0), _Handler)
+    srv.fail500 = False
+    port = srv.server_address[1]
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    _sv_url, _sv_to = cfg.WEIXIN_BRIDGE_URL, cfg.WEIXIN_TO
+    try:
+        cfg.WEIXIN_BRIDGE_URL = f"http://127.0.0.1:{port}"
+        cfg.WEIXIN_TO = "demo-user-id"
+        with tempfile.TemporaryDirectory() as td2:
+            pdf = Path(td2) / "W23.pdf"
+            pdf.write_bytes(b"%PDF-1.4 hello")
+            res_ok = deliver_mod.deliver("wechat-bridge", pdf, title="第23期周报")
+            record("WX01", "bridge 200→投递成功", res_ok.get("ok") is True, res_ok.get("detail"))
+            b = captured.get("body", {})
+            record("WX02", "to=配置收件人", b.get("to") == "demo-user-id", str(b.get("to")))
+            record("WX03", "content 非空(带 PDF 文本)", bool(b.get("content")), str(b.get("content")))
+            record("WX04", "media_path=PDF 绝对路径", b.get("media_path") == str(pdf.resolve()),
+                   str(b.get("media_path")))
+            srv.fail500 = True
+            res_fail = deliver_mod.deliver("wechat-bridge", pdf, title="第23期周报")
+            record("WX05", "bridge 500→可重试失败",
+                   res_fail.get("ok") is False and res_fail.get("retryable") is True, res_fail.get("detail"))
+            res_missing = deliver_mod.deliver("wechat-bridge", Path(td2) / "nope.pdf", title="x")
+            record("WX06", "文件缺失→非可重试错误",
+                   res_missing.get("ok") is False and res_missing.get("retryable") is False, res_missing.get("detail"))
+    finally:
+        cfg.WEIXIN_BRIDGE_URL, cfg.WEIXIN_TO = _sv_url, _sv_to
+        srv.shutdown()
 
     # ---- render（可选依赖，缺失则 SKIP）----
     have_weasy = shutil.which("weasyprint") is not None
