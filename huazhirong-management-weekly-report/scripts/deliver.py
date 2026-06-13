@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
-"""多通道投递层（纯标准库，可扩展）。
+"""多通道投递层（纯标准库，可扩展，带回执判定）。
 
-支持通道：
-- wechat-media : 输出 Hermes→微信桥接约定的 `MEDIA:<绝对路径>` 行（最终回复带它，微信才附 PDF）。
-- wecom        : 企业微信群机器人 webhook 发送文本通知（环境变量 WECOM_WEBHOOK_URL）。
-- feishu       : 飞书自定义机器人 webhook 发送文本通知（环境变量 FEISHU_WEBHOOK_URL）。
+通道：
+- wechat-bridge : 直连 hermes-weixin bridge `POST /send`，读 HTTP 200/500 →**真实成功/失败**
+                  （限流/网络/鉴权失败都会表现为非 200，可重试）。自动化默认。
+- wechat-media  : 仅输出 `MEDIA:<绝对路径>` 行，交给 Hermes 回复→网关代发（**无回执**，交互兜底）。
+- wecom         : 企业微信群机器人 webhook（WECOM_WEBHOOK_URL），文本通知。
+- feishu        : 飞书自定义机器人 webhook（FEISHU_WEBHOOK_URL），文本通知。
 
-设计：核心技能与"投递"解耦——投递是可选的平台胶水层。新增通道只需在 CHANNELS 注册一个函数。
-说明：wecom/feishu 的 webhook 仅能发"文本/卡片通知"；要直接上传 PDF 文件，需各平台的
-      "上传素材 + 应用凭据" API（需要 secret，超出本脚本范围），此处发送含标题与文件路径的通知。
+统一返回 dict：{"ok": bool, "retryable": bool, "channel": str, "detail": str}
+退出码：ok→0；可重试失败→3；配置错误→2。
 
-用法：
-    python3 scripts/deliver.py --channel wechat-media --file output/W23-....pdf
-    python3 scripts/deliver.py --channel wecom  --file output/W23-....pdf --title "第23期周报" [--dry-run]
-    python3 scripts/deliver.py --channel feishu --file output/W23-....pdf --title "第23期周报" [--dry-run]
+参考 hermes-weixin 官方插件：POST /send 体 {to, content, media_path, account_id}，
+成功 200、失败 500（src/bot.ts）；底层任何非 2xx 抛错（src/api/api.ts）。
 """
 
 from __future__ import annotations
@@ -22,71 +21,113 @@ import argparse
 import json
 import os
 import sys
+import urllib.error
 import urllib.request
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import weekly_report_config as cfg  # noqa: E402
 
-def _post_json(url: str, payload: dict, *, dry_run: bool) -> int:
+
+def _post_json(url: str, payload: dict, *, dry_run: bool, timeout: int = 30) -> tuple[int, str]:
     data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     if dry_run:
-        print(f"[dry-run] POST {url}\n{data.decode('utf-8')}")
-        return 0
+        return 200, f"[dry-run] POST {url} {data.decode('utf-8')}"
     req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=20) as resp:  # noqa: S310 (url 来自用户配置)
-        body = resp.read().decode("utf-8", "replace")
-        print(f"HTTP {resp.status}: {body[:200]}")
-        return 0 if resp.status == 200 else 1
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:  # noqa: S310
+            return resp.status, resp.read().decode("utf-8", "replace")
+    except urllib.error.HTTPError as e:
+        return e.code, e.read().decode("utf-8", "replace")
 
 
-def deliver_wechat_media(file: Path, title: str, text: str, dry_run: bool) -> int:
-    # Hermes→微信桥接：最终回复中包含单独一行 MEDIA:<绝对路径>，微信才会附带该 PDF
+def deliver_wechat_bridge(file: Path, title: str, text: str, dry_run: bool) -> dict:
+    if not cfg.WEIXIN_TO:
+        return {"ok": False, "retryable": False, "channel": "wechat-bridge",
+                "detail": "缺少 WEIXIN_TO（收件人 user_id）"}
+    payload = {"to": cfg.WEIXIN_TO, "content": text or title, "media_path": str(file.resolve())}
+    if cfg.WEIXIN_ACCOUNT_ID:
+        payload["account_id"] = cfg.WEIXIN_ACCOUNT_ID
+    url = cfg.WEIXIN_BRIDGE_URL.rstrip("/") + "/send"
+    try:
+        status, body = _post_json(url, payload, dry_run=dry_run)
+    except (urllib.error.URLError, OSError) as e:
+        # 连接失败/超时 → 可重试（含网关未起、限流断连等）
+        return {"ok": False, "retryable": True, "channel": "wechat-bridge", "detail": f"连接异常：{e}"}
+    if status == 200:
+        return {"ok": True, "retryable": False, "channel": "wechat-bridge", "detail": body[:160]}
+    # 500/限流/其它非 200 → 可重试
+    return {"ok": False, "retryable": True, "channel": "wechat-bridge",
+            "detail": f"HTTP {status}: {body[:160]}"}
+
+
+def deliver_wechat_media(file: Path, title: str, text: str, dry_run: bool) -> dict:
+    # 发后不管：输出 MEDIA: 行，由 Hermes 回复→网关代发，无回执
     print(f"MEDIA:{file.resolve()}")
     if text:
         print(text)
-    return 0
+    return {"ok": True, "retryable": False, "channel": "wechat-media", "detail": "emitted MEDIA line (no ack)"}
 
 
-def deliver_wecom(file: Path, title: str, text: str, dry_run: bool) -> int:
-    url = os.environ.get("WECOM_WEBHOOK_URL")
+def _deliver_webhook(channel: str, env_var: str, payload_builder, file: Path, title: str, text: str, dry_run: bool) -> dict:
+    url = os.environ.get(env_var)
     if not url:
-        print("缺少环境变量 WECOM_WEBHOOK_URL（企业微信群机器人 webhook）", file=sys.stderr)
-        return 2
+        return {"ok": False, "retryable": False, "channel": channel, "detail": f"缺少 {env_var}"}
     content = text or f"{title}\n文件：{file.resolve()}"
-    return _post_json(url, {"msgtype": "text", "text": {"content": content}}, dry_run=dry_run)
+    try:
+        status, body = _post_json(url, payload_builder(content), dry_run=dry_run)
+    except (urllib.error.URLError, OSError) as e:
+        return {"ok": False, "retryable": True, "channel": channel, "detail": f"连接异常：{e}"}
+    ok = status == 200
+    return {"ok": ok, "retryable": not ok, "channel": channel, "detail": f"HTTP {status}: {body[:120]}"}
 
 
-def deliver_feishu(file: Path, title: str, text: str, dry_run: bool) -> int:
-    url = os.environ.get("FEISHU_WEBHOOK_URL")
-    if not url:
-        print("缺少环境变量 FEISHU_WEBHOOK_URL（飞书自定义机器人 webhook）", file=sys.stderr)
-        return 2
-    content = text or f"{title}\n文件：{file.resolve()}"
-    return _post_json(url, {"msg_type": "text", "content": {"text": content}}, dry_run=dry_run)
+def deliver_wecom(file: Path, title: str, text: str, dry_run: bool) -> dict:
+    return _deliver_webhook("wecom", "WECOM_WEBHOOK_URL",
+                            lambda c: {"msgtype": "text", "text": {"content": c}},
+                            file, title, text, dry_run)
 
 
-# 新增通道：在此注册即可（保持核心解耦、可扩展）
+def deliver_feishu(file: Path, title: str, text: str, dry_run: bool) -> dict:
+    return _deliver_webhook("feishu", "FEISHU_WEBHOOK_URL",
+                            lambda c: {"msg_type": "text", "content": {"text": c}},
+                            file, title, text, dry_run)
+
+
+# 新增通道：在此注册即可
 CHANNELS = {
+    "wechat-bridge": deliver_wechat_bridge,
     "wechat-media": deliver_wechat_media,
     "wecom": deliver_wecom,
     "feishu": deliver_feishu,
 }
 
 
+def deliver(channel: str, file: Path, title: str = "管理团队周报", text: str = "", dry_run: bool = False) -> dict:
+    """供编排器调用的统一入口。"""
+    if channel not in CHANNELS:
+        return {"ok": False, "retryable": False, "channel": channel, "detail": "未知通道"}
+    return CHANNELS[channel](file, title, text, dry_run)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="多通道投递周报 PDF")
     ap.add_argument("--channel", required=True, choices=sorted(CHANNELS))
-    ap.add_argument("--file", required=True, type=Path, help="待投递文件（PDF）")
-    ap.add_argument("--title", default="管理团队周报", help="通知标题")
-    ap.add_argument("--text", default="", help="自定义通知正文（覆盖默认）")
-    ap.add_argument("--dry-run", action="store_true", help="只打印将要发送的内容，不联网")
+    ap.add_argument("--file", required=True, type=Path)
+    ap.add_argument("--title", default="管理团队周报")
+    ap.add_argument("--text", default="")
+    ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
-    if not args.file.exists() and args.channel != "wechat-media":
-        # wechat-media 仅产出路径行，允许文件尚未生成时预览；其余通道要求文件存在
+    if not args.file.exists() and args.channel != "wechat-media" and not args.dry_run:
         print(f"文件不存在：{args.file}", file=sys.stderr)
         return 2
 
-    return CHANNELS[args.channel](args.file, args.title, args.text, args.dry_run)
+    res = deliver(args.channel, args.file, args.title, args.text, args.dry_run)
+    print(json.dumps(res, ensure_ascii=False))
+    if res["ok"]:
+        return 0
+    return 3 if res["retryable"] else 2
 
 
 if __name__ == "__main__":
