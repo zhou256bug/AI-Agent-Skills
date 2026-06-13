@@ -1,0 +1,11 @@
+PLACEHOLDER — 文件太大无法通过skill_manage写入。
+
+请从 iCloud 恢复：
+1. 原始数据在：/Users/ericstudio/Library/Mobile Documents/com~apple~CloudDocs/skills/business/data/hofstede-dimensions.json
+2. 或重新从 The Culture Factor 抓取：https://www.theculturefactor.com/country-comparison-tool
+
+复制命令：
+cp "/Users/ericstudio/Library/Mobile Documents/com~apple~CloudDocs/skills/business/data/hofstede-dimensions.json" \
+   "/Users/ericstudio/.hermes-huazhirong/skills/cross-cultural-consultant/references/hofstede-dimensions.json"
+
+注意：复制前确认该 JSON 文件末尾无脏数据（检查最后两行是否有多余的"（内容由AI生成，仅供参考）"文本），有则先清理。

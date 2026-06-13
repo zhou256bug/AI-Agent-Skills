@@ -1,0 +1,49 @@
+{
+  "version": "0.3.0",
+  "description": "跨文化管理顾问 — 为中国管理者提供跨文化国家画像与商务沟通建议",
+  "data_snapshot": "2026-05-30",
+  "knowledge_sources": [
+    "港大 EMBA6611 跨文化管理（张轶文教授）",
+    "Hofstede 六维度（119国，The Culture Factor）",
+    "Kluckhohn 价值取向六维度",
+    "Hall 高/低语境沟通理论"
+  ],
+  "evals": [
+    {
+      "name": "A-mode-japan",
+      "input": "下周去日本参加客户二十五周年纪念活动",
+      "expected": "A模式完整报告",
+      "status": "pass"
+    },
+    {
+      "name": "A-mode-mexico",
+      "input": "下个月去墨西哥出差",
+      "expected": "A模式完整报告，含家庭文化提醒",
+      "status": "pass"
+    },
+    {
+      "name": "A-mode-egypt",
+      "input": "给我埃及的文化建议",
+      "expected": "A模式完整报告",
+      "status": "pass"
+    },
+    {
+      "name": "B-mode-germany",
+      "input": "和德国客户谈判时应该注意什么",
+      "expected": "B模式 3-5句话回答",
+      "status": "pass"
+    },
+    {
+      "name": "C-mode-saudi",
+      "input": "在沙特设办事处有什么要注意",
+      "expected": "C模式完整报告+战略警示",
+      "status": "pass"
+    },
+    {
+      "name": "comparison-3-countries",
+      "input": "对比孟加拉、埃及、墨西哥",
+      "expected": "三国表格+Delta分析",
+      "status": "pass"
+    }
+  ]
+}
