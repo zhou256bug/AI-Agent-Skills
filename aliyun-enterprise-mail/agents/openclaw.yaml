@@ -10,8 +10,8 @@ openclaw_json: |
   {
     skills: {
       load: {
-        // AI-Skills  monorepo：扫描仓库内所有 SKILL.md
-        extraDirs: ["~/Projects/AI-Skills"],
+        // AI-Agent-Skills  monorepo：扫描仓库内所有 SKILL.md
+        extraDirs: ["~/Projects/AI-Agent-Skills"],
         watch: true,
         watchDebounceMs: 250,
       },
@@ -33,13 +33,13 @@ openclaw_json: |
 # 安装方式（skill 在子目录时，优先 extraDirs 而非 git install 根目录）
 install_notes: |
   方式 A（推荐 monorepo）：
-    git clone https://github.com/zhou256bug/AI-Skills.git ~/Projects/AI-Skills
+    git clone https://github.com/zhou256bug/AI-Agent-Skills.git ~/Projects/AI-Agent-Skills
     在 openclaw.json 配置 skills.load.extraDirs 指向该目录
 
   方式 B（仅安装本 skill 目录）：
     openclaw skills install ./aliyun-enterprise-mail --as aliyun-enterprise-mail
     或
-    openclaw skills install git:zhou256bug/AI-Skills@main --as aliyun-enterprise-mail
+    openclaw skills install git:zhou256bug/AI-Agent-Skills@main --as aliyun-enterprise-mail
     （若 git 源根目录无 SKILL.md，仍建议用方式 A）
 
 # Agent 加载本 skill 后的固定行为（可写入 agent 自定义 instruction）

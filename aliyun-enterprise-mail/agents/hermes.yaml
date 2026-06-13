@@ -9,8 +9,8 @@ slash_command: /aliyun-enterprise-mail
 hermes_config_yaml: |
   skills:
     external_dirs:
-      # 指向 AI-Skills 仓库根目录（扫描其下所有 */SKILL.md）
-      - ~/Projects/AI-Skills
+      # 指向 AI-Agent-Skills 仓库根目录（扫描其下所有 */SKILL.md）
+      - ~/Projects/AI-Agent-Skills
     # 可选：skill 级配置（通常留空，由 setup apply 自动写 local/credentials.env）
     config:
       skills.config.mail.credentials.target: skill
@@ -40,4 +40,4 @@ install_local: |
   mkdir -p ~/.hermes/skills
   cp -a ./aliyun-enterprise-mail ~/.hermes/skills/aliyun-enterprise-mail
   # 或 symlink：
-  ln -sf ~/Projects/AI-Skills/aliyun-enterprise-mail ~/.hermes/skills/aliyun-enterprise-mail
+  ln -sf ~/Projects/AI-Agent-Skills/aliyun-enterprise-mail ~/.hermes/skills/aliyun-enterprise-mail

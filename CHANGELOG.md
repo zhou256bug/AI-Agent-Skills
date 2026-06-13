@@ -22,6 +22,10 @@
   - 归档输出路径由 `newpos/...` 改为可配置的 `output/...`(operative 段落)
   - 版本号对齐为 0.7.1
 
+### Fixed
+
+- `aliyun-enterprise-mail` 注册文档与 `agents/*.yaml` 仓库名 `AI-Skills` → `AI-Agent-Skills`
+
 ### Removed
 
 - `cross-cultural-consultant` 提升副本移除无效占位 `references/hofstede-dimensions.json` 与 `.v0.3.0-backup/`(原件仍保留于 `migration/cross-cultural-consultant/`)

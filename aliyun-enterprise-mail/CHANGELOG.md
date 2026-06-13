@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- 修正注册文档与 `agents/*.yaml` 中的仓库名：`AI-Skills` → `AI-Agent-Skills`（与实际仓库 `zhou256bug/AI-Agent-Skills` 一致）
+
 ### Added
 
 - 初始 skill：`SKILL.md` 工作流与 `references/imap-setup.md` 配置说明
