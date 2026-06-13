@@ -13,11 +13,16 @@
 
 from __future__ import annotations
 
+import email
 import importlib.util
+import io
+import os
 import shutil
 import subprocess
 import sys
 import tempfile
+from contextlib import redirect_stdout
+from email.message import EmailMessage
 from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parent
@@ -181,6 +186,124 @@ def main() -> int:
     record("PATH02", "命名 W{N}-…格式", paths.format_report_basename(23).startswith("W23-"))
     pp = paths.report_paths(23)
     record("PATH03", "report_paths 落在归档目录下", str(pp["pdf"]).startswith(str(cfg.archive_dir())))
+
+    # ---- fetch 纯函数 ----
+    fetch_mail = _load("wr_fetch", "fetch_mail.py")
+    record("FET01", "发件人+主题匹配命中",
+           fetch_mail.is_weekly_mail("Evyn Chen <evyn.chen@newpostech.com>",
+                                     f"{cfg.SUBJECT_KEY}（23）", cfg.SENDER_EMAIL, cfg.SUBJECT_KEY))
+    record("FET02", "非发件人被拒",
+           not fetch_mail.is_weekly_mail("other@x.com", f"{cfg.SUBJECT_KEY}（23）",
+                                         cfg.SENDER_EMAIL, cfg.SUBJECT_KEY))
+    record("FET03", "期号解析（23）", fetch_mail.parse_week_num(f"{cfg.SUBJECT_KEY}（23）") == 23)
+    record("FET04", "候选优先含 xlsx",
+           fetch_mail.pick_best_candidate(
+               [{"has_xlsx": False, "date": "z"}, {"has_xlsx": True, "date": "a"}])["has_xlsx"])
+    _m = EmailMessage()
+    _m["From"] = "Evyn Chen <evyn.chen@newpostech.com>"
+    _m["Subject"] = f"{cfg.SUBJECT_KEY}（24）"
+    _m.set_content("body")
+    _m.add_attachment(b"PK\x03\x04fake", maintype="application",
+                      subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                      filename="周报（24）.xlsx")
+    _x = fetch_mail.extract_xlsx(email.message_from_bytes(_m.as_bytes()))
+    record("FET05", "提取 xlsx 附件", _x is not None and _x[0].endswith(".xlsx"))
+
+    # ---- 状态机 / 断点续跑（隔离到临时归档目录）----
+    state = _load("wr_state", "state.py")
+    runw = _load("wr_runweekly", "run_weekly.py")
+
+    def _capture(fn, *a, **k):
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            rc = fn(*a, **k)
+        stt = ""
+        for ln in buf.getvalue().splitlines():
+            if ln.startswith("STATE:"):
+                stt = ln[len("STATE:"):].strip()
+        return rc, stt
+
+    _saved_env = os.environ.get("WEEKLY_REPORT_ARCHIVE_DIR")
+    with tempfile.TemporaryDirectory() as td:
+        os.environ["WEEKLY_REPORT_ARCHIVE_DIR"] = td
+        adir = Path(td)
+
+        def _seed(period, *, xlsx=False, md=False, pdf=False, delivered=False):
+            if xlsx:
+                (adir / "input").mkdir(parents=True, exist_ok=True)
+                (adir / "input" / f"W{period}.xlsx").write_bytes(b"x")
+            if md:
+                (adir / f"W{period}-2026年06月08日.md").write_text(GOOD_MIN, encoding="utf-8")
+            if pdf:
+                (adir / f"W{period}-2026年06月08日.pdf").write_bytes(b"%PDF-1.4 test")
+            if delivered:
+                stt = state.load_state(period)
+                state.mark(stt, "deliver", "done")
+                state.save_state(period, stt)
+
+        def mock_deliver_ok(channel, file, title="", text="", dry_run=False):
+            return {"ok": True, "retryable": False, "channel": channel, "detail": "ok"}
+
+        def mock_deliver_limit(channel, file, title="", text="", dry_run=False):
+            return {"ok": False, "retryable": True, "channel": channel, "detail": "HTTP 500: rate limited"}
+
+        # 场景A：取信已完成 → 下次直接做后面（不再取信）
+        fetch_calls = {"n": 0}
+
+        def spy_fetch(period=None):
+            fetch_calls["n"] += 1
+            return {"status": "ok", "period": 23}
+
+        def mock_render_make_pdf(period):
+            md = state.md_path(period)
+            pdf = md.with_suffix(".pdf")
+            pdf.write_bytes(b"%PDF-1.4 test")
+            return True, str(pdf)
+
+        _seed(23, xlsx=True, md=True)  # 取信+撰写已完成，缺 PDF
+        rc, stt = _capture(runw.run, 23, fetcher=spy_fetch,
+                           renderer=mock_render_make_pdf, deliverer=mock_deliver_ok)
+        record("SM01", "取信已完成→跳过取信", fetch_calls["n"] == 0)
+        record("SM02", "续跑直达 DELIVERED", stt == "DELIVERED", stt)
+
+        # 场景B：处理完成、推送被限流 → 下次只补推送（不重渲染）
+        render_calls = {"n": 0}
+
+        def spy_render(period):
+            render_calls["n"] += 1
+            return True, "should-not-be-called"
+
+        _seed(24, xlsx=True, md=True, pdf=True)  # 全部产物就绪，待投递
+        rc, stt = _capture(runw.run, 24, fetcher=spy_fetch,
+                           renderer=spy_render, deliverer=mock_deliver_limit)
+        record("SM03", "限流→DELIVER_RETRY", stt == "DELIVER_RETRY", stt)
+        record("SM04", "补推送时不重渲染", render_calls["n"] == 0)
+        rc, stt = _capture(runw.run, 24, fetcher=spy_fetch,
+                           renderer=spy_render, deliverer=mock_deliver_ok)
+        record("SM05", "再次触发→DELIVERED", stt == "DELIVERED", stt)
+
+        # 场景C：邮件未到 → FETCH_WAIT（静默重试）
+        rc, stt = _capture(runw.run, 25,
+                           fetcher=lambda period=None: {"status": "not_found"},
+                           renderer=spy_render, deliverer=mock_deliver_ok)
+        record("SM06", "邮件未到→FETCH_WAIT", stt == "FETCH_WAIT", stt)
+
+        # 场景D：全部完成 → ALREADY_DONE（幂等）
+        _seed(26, xlsx=True, md=True, pdf=True, delivered=True)
+        rc, stt = _capture(runw.run, 26, fetcher=spy_fetch,
+                           renderer=spy_render, deliverer=mock_deliver_ok)
+        record("SM07", "已交付→ALREADY_DONE 幂等", stt == "ALREADY_DONE", stt)
+
+        # 场景E：仅取信、未撰写 → NEED_COMPOSE（交给 Agent 写四段）
+        _seed(27, xlsx=True)
+        rc, stt = _capture(runw.run, 27, fetcher=spy_fetch,
+                           renderer=spy_render, deliverer=mock_deliver_ok)
+        record("SM08", "缺 Markdown→NEED_COMPOSE", stt == "NEED_COMPOSE", stt)
+
+    if _saved_env is None:
+        os.environ.pop("WEEKLY_REPORT_ARCHIVE_DIR", None)
+    else:
+        os.environ["WEEKLY_REPORT_ARCHIVE_DIR"] = _saved_env
 
     # ---- render（可选依赖，缺失则 SKIP）----
     have_weasy = shutil.which("weasyprint") is not None
