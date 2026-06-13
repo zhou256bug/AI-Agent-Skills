@@ -1,0 +1,57 @@
+# OpenClaw 注册片段
+# 文档：https://docs.openclaw.ai/tools/skills-config
+
+display_name: "Aliyun Enterprise Mail"
+skill_name: aliyun-enterprise-mail
+skill_key: aliyun-enterprise-mail
+
+# 复制到 ~/.openclaw/openclaw.json（JSON5，按你的路径改 extraDirs）
+openclaw_json: |
+  {
+    skills: {
+      load: {
+        // AI-Skills  monorepo：扫描仓库内所有 SKILL.md
+        extraDirs: ["~/Projects/AI-Skills"],
+        watch: true,
+        watchDebounceMs: 250,
+      },
+      entries: {
+        "aliyun-enterprise-mail": {
+          enabled: true,
+          // 不在此写密码；由 Agent 对话 + setup apply 写入 local/credentials.env
+        },
+      },
+    },
+    agents: {
+      defaults: {
+        // 可选：默认启用本 skill；省略则所有 skill 可见
+        skills: ["aliyun-enterprise-mail"],
+      },
+    },
+  }
+
+# 安装方式（skill 在子目录时，优先 extraDirs 而非 git install 根目录）
+install_notes: |
+  方式 A（推荐 monorepo）：
+    git clone https://github.com/zhou256bug/AI-Skills.git ~/Projects/AI-Skills
+    在 openclaw.json 配置 skills.load.extraDirs 指向该目录
+
+  方式 B（仅安装本 skill 目录）：
+    openclaw skills install ./aliyun-enterprise-mail --as aliyun-enterprise-mail
+    或
+    openclaw skills install git:zhou256bug/AI-Skills@main --as aliyun-enterprise-mail
+    （若 git 源根目录无 SKILL.md，仍建议用方式 A）
+
+# Agent 加载本 skill 后的固定行为（可写入 agent 自定义 instruction）
+agent_instruction: |
+  加载 aliyun-enterprise-mail 后：
+  1. 用户提及读邮件/收件箱/未读时，先运行 setup status
+  2. needsSetup 为 true 时，按 references/onboarding-flow.md 向用户收集邮箱与客户端授权密码
+  3. 运行 setup apply --target skill --verify 写入凭据
+  4. 禁止提交 local/credentials.env；禁止在回复中复述密码
+  5. 验证通过后使用 list/read 读信
+
+cli_template: |
+  python {skill_dir}/scripts/read_mail.py setup status
+  python {skill_dir}/scripts/read_mail.py setup apply --user "..." --password "..." --target skill --verify
+  python {skill_dir}/scripts/read_mail.py list --folder INBOX --limit 10

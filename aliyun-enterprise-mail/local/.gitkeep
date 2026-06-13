@@ -1,0 +1,2 @@
+# 凭据落盘目录（clone 后由 Agent setup apply 自动生成 credentials.env）
+# 模板见 credentials.env.example

@@ -1,0 +1,43 @@
+# Hermes Agent 注册片段
+# 文档：https://hermes-agent.nousresearch.com/docs/user-guide/features/skills
+
+display_name: "Aliyun Enterprise Mail"
+skill_name: aliyun-enterprise-mail
+slash_command: /aliyun-enterprise-mail
+
+# 复制到 ~/.hermes/config.yaml 的 skills 段
+hermes_config_yaml: |
+  skills:
+    external_dirs:
+      # 指向 AI-Skills 仓库根目录（扫描其下所有 */SKILL.md）
+      - ~/Projects/AI-Skills
+    # 可选：skill 级配置（通常留空，由 setup apply 自动写 local/credentials.env）
+    config:
+      skills.config.mail.credentials.target: skill
+
+# 首次加载后交互式配置（Hermes 内置）
+hermes_cli: |
+  hermes skills config aliyun-enterprise-mail   # 若 frontmatter 声明了 config 字段
+  hermes chat --toolsets terminal,skills -q "帮我看收件箱"
+
+# 推荐：用 bundle 把「读邮件」相关 instruction 打包成 slash 命令
+bundle_file: bundles/mail-assistant.hermes.yaml
+
+agent_instruction: |
+  加载 aliyun-enterprise-mail 后：
+  1. 读邮件前先执行：python aliyun-enterprise-mail/scripts/read_mail.py setup status
+  2. needsSetup 为 true → 按 references/onboarding-flow.md 对话收集凭据
+  3. setup apply --target skill --verify
+  4. 勿提交 local/credentials.env；勿复述密码
+  5. list / read 读信
+
+cli_template: |
+  python {skill_dir}/scripts/read_mail.py setup status
+  python {skill_dir}/scripts/read_mail.py list --folder INBOX --limit 10
+
+# 仅本 skill 目录拷贝到 Hermes 本地 skills 时：
+install_local: |
+  mkdir -p ~/.hermes/skills
+  cp -a ./aliyun-enterprise-mail ~/.hermes/skills/aliyun-enterprise-mail
+  # 或 symlink：
+  ln -sf ~/Projects/AI-Skills/aliyun-enterprise-mail ~/.hermes/skills/aliyun-enterprise-mail

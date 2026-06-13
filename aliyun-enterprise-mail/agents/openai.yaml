@@ -1,0 +1,4 @@
+interface:
+  display_name: "Aliyun Enterprise Mail"
+  short_description: "Read Alibaba enterprise mailbox via IMAP"
+  default_prompt: "Use $aliyun-enterprise-mail for Alibaba enterprise mail. Before reading mail, run setup status; if needsSetup, follow references/onboarding-flow.md to ask the user for credentials and run setup apply --verify. Never commit local/credentials.env or repeat passwords in replies."
