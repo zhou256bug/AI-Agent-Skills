@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cross-Cultural Consultant"
+  short_description: "跨文化管理顾问：中国管理者出国/来访全程伴侣"
+  default_prompt: "Use $cross-cultural-consultant 处理任何涉及具体国家的跨文化商务问题（出国前画像 A / 出国中场景 B1-B6 / 回国后复盘 D / 经营分析 E / 来访接待 C / 多国对比）。任何国别分析必须读取 data/hofstede-dimensions.json 并给出中国基线 Delta；null 维度标 N/A 不编造；输出不含本地绝对路径。"
