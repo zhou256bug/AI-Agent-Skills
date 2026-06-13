@@ -23,6 +23,32 @@ export WECOM_WEBHOOK_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=.
 python3 scripts/deliver.py --channel wecom --file output/W23-....pdf --title "第23期周报" --dry-run
 ```
 
+## 微信发文件机制与部署要求（重点）
+
+`wechat-bridge` 通道**真正把 PDF 作为微信"文件消息"发送**(收件人可在微信下载该文件)。完整链路(源自官方插件 [hermes-weixin](https://github.com/hypergraphdev/hermes-weixin)):
+
+```
+deliver.py → POST {WEIXIN_BRIDGE_URL}/send  body={to, content, media_path:<abs pdf>}
+  → bot.ts /send：校验 to+content 非空 → 有 media_path → sendWeixinMediaFile
+    → 按 MIME 路由(mime.ts)：application/pdf → 文件附件分支 uploadFileAttachmentToWeixin
+      → upload.ts：读文件 → md5 + AES-ECB 补齐 → getUploadUrl(no_need_thumb)
+        → cdn-upload.ts：AES-ECB 加密 → POST CDN(octet-stream)，最多重试 3 次
+      → send.ts sendFileMessageWeixin：FILE 消息(file_item{media,file_name,len}) → iLink sendmessage
+  ← 200 成功 / 500 任何失败 / 400 缺 to|content
+```
+
+**支持的文件类型(mime.ts)**:pdf/doc(x)/xls(x)/ppt(x)/txt/csv/zip/tar/gz → **文件消息**;png/jpg/gif/webp/bmp → 图片;mp4/mov/webm/mkv/avi → 视频;未知后缀 → `application/octet-stream` 文件附件。
+
+**部署硬性要求**:
+
+1. **文件须在 bridge 进程的文件系统上**:`/send` 用 `path.resolve(media_path)` 以 **bridge 自身 CWD** 解析。本技能发送的是**绝对路径**;若 bridge 与技能不在同机/同容器,需把 `WEEKLY_REPORT_ARCHIVE_DIR` 指向 bridge 也能读的**共享卷**。
+2. **微信账号已登录**(QR 登录 + token 配好),否则 `/send` 返回「Account not configured」。
+3. **`content` 必须非空**:本技能用 `text or title`(title 恒非空),已规避 400。
+4. **大小**:bridge 将整文件读入内存;周报 PDF(~数十 KB)无压力;超大文件受 iLink/微信侧限制,会以 500 形式返回(本技能记为可重试)。
+5. **回执**:`getuploadurl`/CDN/`sendmessage` 任一非 2xx → `/send` 返回 500 → 本技能 `DELIVER_RETRY`(限流即属此类)。
+
+> 验证(无需真实微信):`scripts/run_acceptance.py` 的 `WX01–WX06` 用本地 mock bridge 断言我们确实按 `{to, content(非空), media_path(绝对路径)}` 发送,并正确处理 200→成功 / 500→可重试 / 文件缺失→硬错误。
+
 ## 扩展新通道
 
 在 `scripts/deliver.py` 的 `CHANNELS` 字典注册一个 `deliver_xxx(file, title, text, dry_run)` 函数即可,核心流程无需改动。

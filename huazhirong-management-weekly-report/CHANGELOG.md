@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 凭据 `credentials.env.example` + `local/`(gitignore):IMAP + WEIXIN 配置
 - `weekly_report_config.py` 扩展 IMAP/WEIXIN 配置 + `local/credentials.env` 加载器
 - `run_acceptance.py` 增取信纯函数 + 状态机/续跑用例(取信续跑、限流仅补推送、幂等、NEED_COMPOSE)
+- `run_acceptance.py` 增**微信发文件契约**用例(WX01–WX06):本地 mock bridge 断言 `{to, content非空, media_path绝对路径}` + 200→成功/500→可重试/文件缺失→硬错误
+- `deliver.py` wechat-bridge **发送前校验文件存在且非空**(bridge 以自身文件系统解析 media_path)
+- `references/delivery-channels.md` 增「微信发文件机制与部署要求」(完整链路 + 支持类型 + 同机/共享卷要求 + 回执)
 
 ### Notes（取信设计）
 
