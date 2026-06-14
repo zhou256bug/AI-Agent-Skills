@@ -48,4 +48,4 @@
 
 ## 输出 PDF
 
-使用 cross-cultural-consultant 的 HTML → pdfprint PDF 流程，标题标识为"经营分析"，存档路径：`newpos/市场/巴西/巴西PagBank业务节奏_跨文化分析.pdf`。
+使用 cross-cultural-consultant 的 `scripts/render_mobile_pdf.py`，标题标识为「经营分析」，存档路径：`output/市场/巴西/巴西PagBank业务节奏_跨文化分析.pdf`。

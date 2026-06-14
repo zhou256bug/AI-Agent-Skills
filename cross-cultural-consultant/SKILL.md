@@ -1,6 +1,6 @@
 ---
 name: cross-cultural-consultant
-version: 0.7.1
+version: 0.8.1
 description: 中国管理者跨文化伴侣——出国前画像/出国中场景问答/回国后复盘/来访接待(Reverse A)。涉及具体国家、海外客户、外派/本地化、跨文化困惑时触发;不涉及国家的纯商务问题不触发。OpenClaw/Hermes clone 后开箱即用,知识与数据自包含,无需凭据。Use when 跨文化、出国、海外客户、出差、外派、本地化、Hofstede、文化画像、来访接待、openclaw、hermes。
 metadata: {"openclaw":{"requires":{"bins":["python3"]},"skillKey":"cross-cultural-consultant","emoji":"🌏"},"hermes":{"tags":["cross-cultural","management","hofstede","intercultural","business"],"category":"productivity","requires_toolsets":["terminal"]}}
 user-invocable: true
@@ -11,7 +11,7 @@ country_count: 119
 knowledge_source: 港大 EMBA6611(张轶文教授)+ Hofstede + Kluckhohn + Hall
 ---
 
-# 跨文化管理顾问 Skill v0.7.1
+# 跨文化管理顾问 Skill v0.8.1
 
 > **三段式使用流**:出国前画像 → 出国中场景问答 → 回国后复盘 + C 来访接待
 >
@@ -21,7 +21,7 @@ knowledge_source: 港大 EMBA6611(张轶文教授)+ Hofstede + Kluckhohn + Hall
 
 ## 零、开箱即用与注册(OpenClaw / Hermes)
 
-本 skill **知识与数据自包含**(`data/` + `modules/` + `frameworks/`),**无任何凭据依赖**——clone 仓库 → 加载 SKILL.md 即可用 A/B/D/E/对比等模式。仅"手机 PDF"(§十三)需额外可选依赖,见 §十三。
+本 skill **知识与数据自包含**(`data/` + `modules/` + `frameworks/`),**无任何凭据依赖**——clone 仓库 → 加载 SKILL.md 即可用 A/B/D/E/对比等模式。可选依赖:"手机 PDF"(§十三)见该节;C 模式名片 OCR 见 §十四。
 
 - **平台注册(复制即用)**:见 `references/openclaw-hermes-registration.md`(含 `openclaw.json` / `~/.hermes/config.yaml` 片段)
 - **平台配置源文件**:`agents/openclaw.yaml`、`agents/hermes.yaml`、`agents/openai.yaml`
@@ -38,7 +38,7 @@ knowledge_source: 港大 EMBA6611(张轶文教授)+ Hofstede + Kluckhohn + Hall
 - **出国前**(画像):看完整国家文化报告 + 踩坑清单 + checklist
 - **出国中**(场景问答):餐桌/谈判/送礼/会议/突发
 - **回国后**(复盘):为什么没谈成/谈成
-- **C 来访接待(Reverse A)**:外国人/客户团来中国时,用 A 模式分析对方国别 + 额外输出战备手册(含中国趋势、话术、路线图)。会后还有晚宴台卡、名片归类和客户档案更新三个环节。
+- **C 来访接待(Reverse A)**:外国人/客户团来中国时,用 A 模式分析对方国别 + 额外输出战备手册(含中国趋势、话术、路线图)。会后还有晚宴台卡、名片归类与客户档案/纪要更新(**本 Agent 直接写 `output/crm/`**,见 `references/crm-workflow.md`,禁止委派外部 Agent 或依赖其他 skill)。
 
 知识体系三层:
 - **数据层**:`data/hofstede-dimensions.json`(119 国六维度)
@@ -52,10 +52,14 @@ knowledge_source: 港大 EMBA6611(张轶文教授)+ Hofstede + Kluckhohn + Hall
 **参考文件**:
 - `references/pdf-trip-report-workflow.md` — PDF 工作流（含手机版）
 - `scripts/render_mobile_pdf.py` — **手机竖版 PDF 唯一入口**（284pt / 10pt NotoSC / weasyprint + crop）
-- `references/validation-data-against-real-experience-2026-05-30.md` — 菜头用 4 国真实出差经验验证的数据一致性记录
+- `references/validation-data-against-real-experience-2026-05-30.md` — 老板用 4 国真实出差经验验证的数据一致性记录
 - `references/A-mode-bangladesh-phone-financing.md` — A 模式扩展：孟加拉画像 + 手机分期/金融项目的行业适配建议（Consumer Finance、风控结构、推广路径）
 - `references/B-mode-compare-mexico-egypt-bangladesh.md` — B 模式示例：墨埃孟三国对比
 - `references/C-mode-cielo-receiving-visitors-2026-06-04.md` — C 模式示例：巴西 Cielo 高管团来访接待全流程 PDF 战备手册
+- `references/crm-workflow.md` — C 模式会后 CRM（单 Agent 闭环：名片/档案/纪要，写 `output/crm/`）
+- `references/crm-card-note-template.md` — 名片笔记模板
+- `references/crm-meeting-note-template.md` — 会议纪要模板
+- `scripts/ocr_card.py` — 名片 OCR（可选 tesseract；未安装时 Agent 识图兜底）
 - `references/b6-speechcraft.md` — B6 话术撰写：为非流利英语的中国管理者撰写英文话术的语用规则、篇幅控制和交付格式
 
 ```
@@ -88,7 +92,8 @@ cross-cultural-consultant/
 ├── evals.json            # 评测用例定义
 └── scripts/
     ├── validate-data.py      # 数据完整性校验
-    └── render_mobile_pdf.py  # 手机竖版 PDF 唯一入口(可选依赖)
+    ├── render_mobile_pdf.py  # 手机竖版 PDF 唯一入口(可选依赖)
+    └── ocr_card.py           # 名片 OCR（C 模式会后，可选 tesseract）
 ```
 
 **按需加载原则**:你不必每次都读完整 SKILL.md。先看本文件的"三、场景路由表",决定加载哪个 module,只读对应 module 文件即可。frameworks/ 文件只在被 module 引用时加载。
@@ -102,7 +107,7 @@ cross-cultural-consultant/
 | 模式 | 触发词示例 | 加载文件 | 输出长度 |
 |------|-----------|---------|---------|
 | **A 出国前画像** | "下周去 X" / "X 国画像" / 只给国家名 | `modules/before-travel.md` | 1200-1800 字 |
-| **C 来访接待(Reverse A)** | "X 国客户来中国" / "接待 X" / "来访" + 有名单 | A 模式分析对方国别,额外产出 Pdf 战备手册(见 references/C-mode-cielo-*) | 6-10 页 A4 PDF |
+| **C 来访接待(Reverse A)** | "X 国客户来中国" / "接待 X" / "来访" + 有名单 | A 模式分析对方国别,额外产出 Pdf 战备手册(见 references/C-mode-cielo-*);会后 CRM 见 references/crm-workflow.md | 6-10 页 A4 PDF |
 | **B1 餐桌** | "今晚请 X 客户吃饭" / "喝什么酒" / "敬酒" | `modules/during-dining.md` | 300-500 字 |
 | **B2 谈判** | "谈合同" / "解约" / "终止合同" / "怎么接话" / "下一步" | `modules/during-negotiation.md` | 300-500 字（解约场景可放宽至 1000-1500 字，需结合合同条款逐条分析） |
 | **B3 送礼** | "送礼" / "带什么礼物" / "伴手礼" | `modules/during-gifting.md` | 300-500 字 |
@@ -256,7 +261,7 @@ JSON 中没有的国家:如实告知,建议在 Hofstede 网站查询。
 **沙特**:沙化率合规、女性议题敏感(社会正在变迁)、王室政治不卷入
 **TSMC 亚利桑那 vs 熊本**:文化松紧度不是决定因素,地方政府对外资的制度态度才是
 
-详细案例与展开见 `.v0.3.0-backup/SKILL.md` 第六节(保留参考)。
+详细案例与展开见 `migration/cross-cultural-consultant/.v0.3.0-backup/SKILL.md` 第六节(保留参考)。
 
 ---
 
@@ -304,25 +309,26 @@ JSON 中没有的国家:如实告知,建议在 Hofstede 网站查询。
 
 ## 十二、版本与更新
 
-- **当前版本**:v0.7.1(2026-06-09)
+- **当前版本**:v0.8.1(2026-06-13)
 - **重大变更**:
-  - v0.7.1: 新增A模式参考文件「孟加拉 + 手机分期项目评估」。A模式用于金融/分期等具体业务场景时须追加行业适配建议（风控结构、分期周期、推广路径、催收机制），而非仅给出差通用画像。
+  - v0.8.1: PDF preset `cielo`→`mobile-default`;删除已合并占位 `F-mode-brazil-cielo-2026-06-04.md`
+  - v0.8.0: 平台解耦定版——C 模式单 Agent CRM(`output/crm/` + `ocr_card.py`);归档统一 `output/`;`菜头`→`老板`;移除 Mac/`newpos` 路径绑定;补 §十四 CRM 铁律
   - v0.7.0: 新增 B6 话术撰写模式 — 为非流利英语的中国管理者设计英文话术，含语用规则、篇幅控制和交付格式（看 `references/b6-speechcraft.md`）。新增触发词路由到 B6。  
   - v0.6.1: C 模式参考文件增加全流程环节（会前→会中→会后）、产出物清单、晚宴台卡和名片归类环节。合并重复的 F-mode-cielo 参考文件。C 模式描述更新为包含会后三环节。
   - v0.6.0: 新增 C 模式（来访接待 Reverse A）。新增 Cielo 案例参考。
   - v0.5.1: 增加"解约谈判"场景的路由和处理规则；新增巴西 Fernando 解约谈判参考案例
   - v0.5.0: 新增 E 模式（经营分析）用于诊断已投入重金的现有客户关系。新增巴西 PagBank 参考示例。
 - **数据更新**:Hofstede 数据每半年重抓(在 `data/hofstede-dimensions.json` 顶部 `scraped_at` 字段)
-- **回退**:v0.3.0 完整副本保留在 `.v0.3.0-backup/`
+- **回退**:v0.3.0 完整副本保留在 `migration/cross-cultural-consultant/.v0.3.0-backup/`
 
 **输出脚注**(每次输出末尾):
-> 数据快照:YYYY-MM-DD | Skill v0.7.1 | 数据为国家层面统计倾向,个体差异始终存在
+> 数据快照:YYYY-MM-DD | Skill v0.8.1 | 数据为国家层面统计倾向,个体差异始终存在
 
 ---
 
 ## 十三、手机 PDF 输出（铁律）
 
-菜头要「手机可读 / 单页 / 长条形 / 全中文 PDF」时：
+老板要「手机可读 / 单页 / 长条形 / 全中文 PDF」时：
 
 > **可选依赖**:手机 PDF 为可选能力,需本机安装 `weasyprint`、`ghostscript`、Python 包 `PyMuPDF`(脚本内 `fitz`,用于裁剪)+ 中文字体 Noto Sans SC。脚本用 `Path.home()` 定位字体,**不依赖任何特定用户的绝对路径**。未安装时 A/B/D/E 文本模式不受影响,直接交付 Markdown 即可。
 
@@ -339,6 +345,27 @@ python3 cross-cultural-consultant/scripts/render_mobile_pdf.py \
 
 （若已 `cd` 到 skill 根目录,可用相对路径 `scripts/render_mobile_pdf.py`。）
 
-3. `--body-md` 写纯中文 Markdown；**正文 10pt / 宽度 284pt 由脚本锁定**（Cielo 金标准）
+3. `--body-md` 写纯中文 Markdown；**正文 10pt / 宽度 284pt 由脚本锁定**（`mobile-default` 预设）
 4. 生成后推送 PDF 并告知完整路径(归档根目录可按你的环境配置,默认 `output/`)
 5. A4 可打印版仍见 `references/pdf-trip-report-workflow.md` 选项 A
+
+---
+
+## 十四、C 模式会后 CRM（单 Agent 闭环）
+
+来访接待会后涉及名片、客户档案、会议纪要时:
+
+> **铁律**:全部由**运行本 skill 的 Agent**完成(写 `output/crm/`)。**禁止** `delegate_task`、`hermes -p …`、调用其他 skill/profile 或写入仓库外绝对路径。
+
+1. **流程与路径**:见 `references/crm-workflow.md`
+2. **模板**:名片 `references/crm-card-note-template.md`;纪要 `references/crm-meeting-note-template.md`
+3. **名片 OCR（推荐）**:
+
+```bash
+python3 cross-cultural-consultant/scripts/ocr_card.py --image /path/to/card.jpg --lang chi_sim+eng
+```
+
+（`cd` 到 skill 根目录时可用 `scripts/ocr_card.py`。）
+
+4. **退出码 2**（未安装 tesseract）:Agent 改用识图读取名片,或请用户粘贴文字,仍按模板写 `output/crm/`
+5. **可选系统依赖**:`tesseract` + `chi_sim`/`eng` 语言包（与 PDF 的 weasyprint 同属可选层;缺失不影响 A/B/D/E 文本模式）
