@@ -8,13 +8,17 @@
 
 ## [Unreleased]
 
-### Changed
-
-- `huazhirong-legal-affairs` **v0.3.0**：emoji 输出规范 + 手机 PDF（`render_review_pdf.py`，参考跨文化 `mobile-default`）
-
 ### Added
 
-- `huazhirong-legal-affairs` **v0.2.0**：P2 F/G（股权激励/合资增资）、setup 引导配置、`run_acceptance.py` 验收套件、evals 20 条
+- **技能设计宪法** `docs/SKILL-DESIGN-STANDARDS.md`（七大原则 + 脚手架 + Checklist）
+- `docs/skill-template/` 新技能上线 Checklist 与指引
+- `.cursor/rules/skill-design-standards.mdc`（Agent 开发时自动遵守）
+- 仓库级 `scripts/validate_skill_scaffold.py`（校验根目录技能最低硬性文件）
+
+### Changed
+
+- 根 `README.md` 技能开发规范扩展为七大原则摘要并链到标准文档
+- `huazhirong-legal-affairs` **v0.3.0**：emoji 输出规范 + 手机 PDF（`render_review_pdf.py`，参考跨文化 `mobile-default`）
 - 规范化技能 `huazhirong-legal-affairs`(提升至仓库根,独立完整):
   - P0：海外经销(A)、采购供货(B)、境内用工(C)、境外用工简引(D)、解约终止(E)、POS合规(H)
   - 从 migration Playbook 改写(去委派/newpos/方律/大为);真实案例结构(7-Labs/Law 173、巴西顾问解约)

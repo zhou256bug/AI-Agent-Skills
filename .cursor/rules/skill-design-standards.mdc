@@ -1,0 +1,42 @@
+---
+name: skill-design-standards
+description: AI-Agent-Skills monorepo 技能设计硬性规则。新建或规范化技能时必须遵守。
+alwaysApply: true
+---
+
+# 技能设计硬性规则
+
+开发 `AI-Agent-Skills` 仓库内**任何新技能**或**规范化 migration 技能**时，必须先阅读并遵守：
+
+**全文**：`docs/SKILL-DESIGN-STANDARDS.md`  
+**模板**：`docs/skill-template/CHECKLIST.md`
+
+## 七大原则（不可省略）
+
+1. **通用化** — 无 `$HERMES_HOME`、`newpos/`、人名委派链；平台无关
+2. **独立跑通** — 单 skill 目录可注册自检；`run_acceptance.py` 或 `run_evals.py`
+3. **开箱即用** — 默认值可跑；知识/data 自包含；`SKILL.md` §零写注册路径
+4. **参数化** — `scripts/*_config.py` + 环境变量；业务常量不散落
+5. **引导配置化** — 有凭据/个性化 → `setup status` / `setup apply` / `onboarding-flow.md`
+6. **Emoji 化** — 报告输出类 → `emoji-output-guide.md`；`📌🔴🟡🟢👉⚗️`
+7. **手机体验化** — 长报告类 → `render_mobile_pdf.py` + `pdf-*-workflow.md`；禁手写 HTML
+
+## 基础铁律
+
+- **单 Agent 闭环** — 禁止 `delegate_task`、禁止委派其他 skill
+- **渐进式加载** — `SKILL.md` 只路由；细节在 `modules/` / `references/`
+- **归档 `output/`** — gitignore；可配置路径
+- **平台脚手架** — `agents/` + `bundles/` + `openclaw-hermes-registration.md`
+- **CHANGELOG** — 技能级 + 根级 Keep a Changelog + SemVer
+- **凭据不入库** — 仅 `local/credentials.env.example`
+
+## 合并前必跑
+
+```bash
+python3 scripts/validate_skill_scaffold.py
+python3 <skill>/scripts/run_acceptance.py   # 或 evaluation/run_evals.py
+```
+
+## 参考技能
+
+`cross-cultural-consultant` · `aliyun-enterprise-mail` · `huazhirong-management-weekly-report` · `huazhirong-legal-affairs`
