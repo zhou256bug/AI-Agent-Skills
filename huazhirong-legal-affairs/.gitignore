@@ -3,4 +3,3 @@ __pycache__/
 output/
 local/credentials.env
 .DS_Store
-local/
