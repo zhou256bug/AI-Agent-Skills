@@ -26,6 +26,7 @@
 
 ### Changed
 
+- `huazhirong-management-weekly-report` **v1.0.0 定版**：补技能级 `README.md`、CHANGELOG 收口；验收 44/44
 - `cross-cultural-consultant` **v0.8.1**：PDF preset `mobile-default`、删除 F-mode 占位；含 v0.8.0 定版（单 Agent CRM、`output/` 归档、平台解耦）
 - `cross-cultural-consultant` C 模式会后改为单 Agent 闭环（移除大为/emma 委派；`output/crm/` + `ocr_card.py`）
 - `cross-cultural-consultant` 去语境化（人名）：全技能 `菜头` → `老板`（`SKILL.md` 与 9 个 `references/` 文档，共 22 处）
@@ -52,6 +53,7 @@
 - `migration/` 保留原始迁移素材;`huazhirong-business-support` 因强耦合,待单独讨论后再规范化
 - `cross-cultural-consultant` 中涉及特定同事/公司语境(菜头、emma/大为 委派、newpos/Obsidian)的案例参考文件本轮未改,留待后续讨论
 - `cross-cultural-consultant` **P2 文档抛光**（README 适用对象、A4 模板 Hermes 字样、evals C/E/B6 等）已记入技能 `CHANGELOG.md` Planned 段,合并后择机处理,不阻塞发版
+- `huazhirong-management-weekly-report` **P2**（`PROJECT_SOURCES` 外置、evals.json 等）已记入技能 `CHANGELOG.md` Planned 段
 - `huazhirong-management-weekly-report` 的 `PROJECT_SOURCES`(项目→周报负责人)为华智融默认业务数据,可按需替换
 
 ## [0.0.0]
