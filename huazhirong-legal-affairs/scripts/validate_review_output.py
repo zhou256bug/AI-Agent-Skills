@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """校验合同审核输出结构（纯标准库）。
 
-检查审核意见 Markdown 是否包含必需段落标记。
-可用于 Agent 输出后的本地自检。
-
 用法：
-    python3 scripts/validate_review_output.py --sample   # 校验内置样例
-    python3 scripts/validate_review_output.py <file.md>  # 校验指定文件
+    python3 scripts/validate_review_output.py --sample     # A 模式样例
+    python3 scripts/validate_review_output.py --sample-f   # F 模式样例
+    python3 scripts/validate_review_output.py --sample-g   # G 模式样例
+    python3 scripts/validate_review_output.py <file.md>
 """
 
 from __future__ import annotations
@@ -18,15 +17,15 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 
-# 所有模式通用的必需标记
 COMMON_REQUIRED = ["结论", "免责声明"]
 
-# 各模式额外必需标记
 MODE_MARKERS: dict[str, list[str]] = {
     "A": ["我方立场", "🔴", "🟡", "🟢", "建议下一步"],
     "B": ["我方立场", "🔴", "🟡", "🟢"],
     "C": ["🔴", "🟡", "🟢"],
     "E": ["方案", "🔴"],
+    "F": ["🔴", "外部律师"],
+    "G": ["出资", "🔴"],
     "H": ["🔴"],
 }
 
@@ -51,9 +50,61 @@ SAMPLE_A = """\
 > **免责声明**：本意见为内部合同初审，不构成正式法律意见。
 """
 
+SAMPLE_F = """\
+## 股权激励审核 — 核心研发 / 期权授予 / 新签
+
+**结论**：行权价无评估依据且未约定离职回购，为最大风险。
+
+### 🔴 必须改
+1. 行权定价 — 无公允价值评估报告
+
+### 🟡 建议改
+1. 加速归属条件未与并购场景挂钩
+
+### 🟢 可接受
+1. 激励对象限定为核心技术人员
+
+### 建议外部律师确认项
+- 期权池稀释对控制权的影响
+- 税务递延纳税资格
+
+### 建议下一步
+暂停签署，补充评估报告后升级老板。
+
+> **免责声明**：本意见为内部合同初审，不构成正式法律意见。
+"""
+
+SAMPLE_G = """\
+## 股东/合资协议审核 — 墨西哥子公司 / 增资 / 新签
+
+**结论**：出资方式未在协议中明确借款 vs 增资路径，为最大风险。
+
+### 出资结构对比
+| 方式 | 税务 | 治理 | 建议 |
+| 股东借款 | 利润还本 | 债权 | 短期过桥 |
+| 增资 | 分红预提税 | 股权 | 长期资本 |
+
+### 🔴 必须改
+1. 治理条款 — 我方无重大事项否决权
+
+### 🟡 注意
+1. 退出估值方法未约定
+
+### 🟢 可接受
+1. 争议解决为中国法 + CIETAC
+
+### 建议董事会/老板下一步
+股东会前明确出资形式与金额区间。
+
+> **免责声明**：本意见为内部合同初审，不构成正式法律意见。
+"""
+
 
 def detect_mode(text: str) -> str:
-    """根据标题行推断模式。"""
+    if "股权激励审核" in text:
+        return "F"
+    if "股东/合资协议审核" in text or "股东" in text and "增资" in text:
+        return "G"
     if "采购合同审核" in text:
         return "B"
     if "人事合同审核" in text:
@@ -68,7 +119,6 @@ def detect_mode(text: str) -> str:
 
 
 def validate(text: str) -> list[str]:
-    """返回缺失标记列表；空列表表示通过。"""
     errors: list[str] = []
     mode = detect_mode(text)
 
@@ -80,7 +130,6 @@ def validate(text: str) -> list[str]:
         if marker not in text:
             errors.append(f"缺少 {mode} 模式标记：{marker}")
 
-    # 禁止本地绝对路径
     if re.search(r"/Users/\w+", text):
         errors.append("输出含本地绝对路径 /Users/...")
 
@@ -91,11 +140,16 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="校验合同审核输出结构")
     parser.add_argument("file", nargs="?", help="待校验的 Markdown 文件")
     parser.add_argument("--sample", action="store_true", help="校验内置 A 模式样例")
+    parser.add_argument("--sample-f", action="store_true", help="校验内置 F 模式样例")
+    parser.add_argument("--sample-g", action="store_true", help="校验内置 G 模式样例")
     args = parser.parse_args()
 
     if args.sample:
-        text = SAMPLE_A
-        label = "内置 A 模式样例"
+        text, label = SAMPLE_A, "内置 A 模式样例"
+    elif args.sample_f:
+        text, label = SAMPLE_F, "内置 F 模式样例"
+    elif args.sample_g:
+        text, label = SAMPLE_G, "内置 G 模式样例"
     elif args.file:
         path = Path(args.file)
         if not path.exists():

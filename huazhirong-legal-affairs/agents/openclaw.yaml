@@ -1,5 +1,4 @@
 # OpenClaw Agent 注册片段
-# 文档：https://docs.openclaw.ai/tools/skills
 
 display_name: "华智融法务"
 skill_name: huazhirong-legal-affairs
@@ -27,12 +26,11 @@ openclaw_json: |
 
 agent_instruction: |
   加载 huazhirong-legal-affairs 后：
-  1. 先读 SKILL.md「三、场景路由表」，按触发词只加载对应 module
-  2. 收到合同第一步：填 contract-routing.md 确认我方角色（甲方/乙方/用人单位）
-  3. 续签必做新旧对比；Tier 1/2/3 评估；结论先行输出 🔴/🟡/🟢
-  4. 审核意见归档 output/合同/；文末附免责声明
-  5. 单 Agent 闭环，禁止委派外部 Agent 或其他 skill
+  1. 首次使用先 setup status；needsSetup 时引导 setup apply --verify
+  2. 按 SKILL.md 场景路由表识别模式（A/B/C/D/E/F/G/H/J/S）
+  3. 先分类确认角色，续签必对比，Tier 评估，归档 output/
+  4. 单 Agent 闭环，禁止委派
 
 cli_template: |
-  python3 {skill_dir}/evaluation/run_evals.py
-  python3 {skill_dir}/scripts/validate_review_output.py --sample
+  python3 {skill_dir}/scripts/run_acceptance.py
+  python3 {skill_dir}/scripts/legal_affairs_cli.py setup status

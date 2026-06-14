@@ -23,7 +23,7 @@ EVALS_PATH = SKILL_ROOT / "evals.json"
 DATA_PATH = SKILL_ROOT / "data" / "jurisdiction-index.json"
 
 MODULE_PATH_RE = re.compile(
-    r"((?:modules|references|frameworks|data)/[\w./-]+(?:\.md|\.json)?)"
+    r"((?:modules|references|frameworks|data|scripts)/[\w./-]+(?:\.md|\.json|\.py)?)"
 )
 
 REQUIRED_FIELDS = ("name", "input", "expected_mode", "expected", "must_have", "loads_module")

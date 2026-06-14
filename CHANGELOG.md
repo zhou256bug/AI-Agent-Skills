@@ -10,6 +10,7 @@
 
 ### Added
 
+- `huazhirong-legal-affairs` **v0.2.0**：P2 F/G（股权激励/合资增资）、setup 引导配置、`run_acceptance.py` 验收套件、evals 20 条
 - 规范化技能 `huazhirong-legal-affairs`(提升至仓库根,独立完整):
   - P0：海外经销(A)、采购供货(B)、境内用工(C)、境外用工简引(D)、解约终止(E)、POS合规(H)
   - 从 migration Playbook 改写(去委派/newpos/方律/大为);真实案例结构(7-Labs/Law 173、巴西顾问解约)

@@ -1,7 +1,7 @@
 ---
 name: huazhirong-legal-affairs
-version: 0.1.0
-description: 华智融法务合同审核——海外经销/采购供货/境内用工/顾问解约/POS合规速查。单 Agent 闭环，Playbook 自包含，归档 output/。Use when 合同审核、经销协议、采购合同、劳动合同、解约终止、Law 173、POS合规、openclaw、hermes。
+version: 0.2.0
+description: 华智融法务合同审核——海外经销/采购/境内用工/解约/POS合规/股权激励/合资增资。单 Agent 闭环，支持 setup 引导配置，归档 output/。Use when 合同审核、经销协议、采购合同、劳动合同、解约终止、Law 173、POS合规、期权、JV、增资、openclaw、hermes、setup。
 metadata: {"openclaw":{"requires":{"bins":["python3"]},"skillKey":"huazhirong-legal-affairs","emoji":"⚖️"},"hermes":{"tags":["legal","contract","huazhirong","procurement","labor","pos"],"category":"productivity","requires_toolsets":["terminal"]}}
 user-invocable: true
 license: MIT
@@ -9,22 +9,27 @@ data_snapshot: 2026-06-13
 knowledge_source: 华智融真实合同案例(7-Labs/Law 173、巴西顾问解约) + migration Playbook 改写
 ---
 
-# 华智融法务技能 v0.1.0
+# 华智融法务技能 v0.2.0
 
 > **单 Agent 闭环**：分类 → 加载 Playbook → 条款评估 → 输出审核意见 → 归档 `output/合同/`
 >
-> **知识来源**：华智融海外经销/采购/用工 Playbook + 拉美保护法速查 + POS 合规专章 + 真实案例结构（7-Labs、巴西顾问解约）
+> **知识来源**：华智融海外经销/采购/用工/股权 Playbook + 拉美保护法速查 + POS 合规专章 + 真实案例结构（7-Labs、巴西顾问解约、墨西哥增资）
 
 ---
 
 ## 零、开箱即用与注册（OpenClaw / Hermes）
 
-本 skill **Playbook 与案例自包含**（`references/` + `modules/` + `frameworks/`），**无任何凭据依赖**——clone 仓库 → 加载 SKILL.md 即可用。
+本 skill **Playbook 与案例自包含**（`references/` + `modules/` + `frameworks/`），**无密码凭据**——clone 仓库 → 加载 SKILL.md 即可用。首次使用可运行 **setup 引导配置**个性化决策者/归档路径/签约主体。
 
 - **平台注册**：见 `references/openclaw-hermes-registration.md`
+- **引导配置**：见 `references/onboarding-flow.md`
 - **平台配置源文件**：`agents/openclaw.yaml`、`agents/hermes.yaml`、`agents/openai.yaml`
 - **Hermes bundle（slash `/legal-affairs`）**：`bundles/legal-affairs.hermes.yaml`
-- **自检（可选）**：
+- **引导配置 CLI**：
+  - `python3 huazhirong-legal-affairs/scripts/legal_affairs_cli.py setup status`
+  - `python3 huazhirong-legal-affairs/scripts/legal_affairs_cli.py setup apply --verify`
+- **自检（推荐）**：
+  - `python3 huazhirong-legal-affairs/scripts/run_acceptance.py`
   - `python3 huazhirong-legal-affairs/evaluation/run_evals.py`
   - `python3 huazhirong-legal-affairs/scripts/validate_review_output.py --sample`
 
@@ -60,22 +65,30 @@ huazhirong-legal-affairs/
 │   ├── contract-distribution.md   # A 海外经销
 │   ├── contract-procurement.md    # B 采购供货
 │   ├── labor-domestic.md          # C 境内用工
-│   └── contract-termination.md    # E 解约终止
+│   ├── contract-termination.md    # E 解约终止
+│   ├── equity-incentive.md        # F 股权激励/期权
+│   └── corporate-jv.md            # G 合资/股东协议/增资
 ├── references/                 # Playbook 与案例
 │   ├── contract-routing.md
 │   ├── negotiation-playbook.md
 │   ├── procurement-playbook.md
 │   ├── labor-cn-playbook.md
+│   ├── equity-incentive-playbook.md
+│   ├── corporate-jv-playbook.md
 │   ├── latam-distributor-law.md
 │   ├── pos-contract-clauses.md
 │   ├── pos-payment-compliance.md
 │   ├── termination-strategies.md
 │   ├── distribution-review-workflow.md
 │   ├── review-output-template.md
+│   ├── onboarding-flow.md
 │   └── openclaw-hermes-registration.md
 ├── scripts/
 │   ├── legal_affairs_config.py
-│   └── validate_review_output.py
+│   ├── legal_affairs_lib.py
+│   ├── legal_affairs_cli.py
+│   ├── validate_review_output.py
+│   └── run_acceptance.py
 └── evaluation/run_evals.py
 ```
 
@@ -92,8 +105,11 @@ huazhirong-legal-affairs/
 | **C** | 劳动合同、试用期、竞业、社保、员工手册、境内用工 | `modules/labor-domestic.md` | `labor-cn-playbook.md` |
 | **D** | 境外当地雇员、巴西/欧洲/墨西哥/马来/印度/迪拜用工 | 简引 `data/jurisdiction-index.json` + `labor-cn-playbook.md` §境外 | P0 主做 C；D 输出结构参考 + 升级当地律师 |
 | **E** | 解约、终止、顾问协议解除、通知期、锁定期、协商解除 | `modules/contract-termination.md` | `termination-strategies.md` |
+| **F** | 期权、股权激励、ESOP、限制性股票、行权、vesting | `modules/equity-incentive.md` | `equity-incentive-playbook.md` |
+| **G** | JV、合资、股东协议、增资、股权转让、股东借款、出资方案 | `modules/corporate-jv.md` | `corporate-jv-playbook.md` |
 | **H** | POS 合规、PCI、SDK、认证、3C、RoHS、支付牌照 | 直接读 references | `pos-contract-clauses.md` + `pos-payment-compliance.md` |
 | **J** | 意图不清、缺合同文本、缺国别/角色信息 | 澄清提问 | `contract-routing.md` |
+| **S** | 配置法务技能、setup、个性化决策者/归档 | 运行 CLI | `onboarding-flow.md` |
 
 **防混提醒**（收到合同时第一步）：
 
@@ -102,8 +118,27 @@ huazhirong-legal-affairs/
 | 海外经销 POS | **乙方** Vendor | `negotiation-playbook.md` |
 | 采购供货 | **甲方** Buyer | `procurement-playbook.md` |
 | 境内用工 | **用人单位** | `labor-cn-playbook.md` |
+| 股权激励/期权 | **授予方/用人单位** | `equity-incentive-playbook.md` |
+| 合资/增资 | **股东/投资方** | `corporate-jv-playbook.md` |
 
 ---
+
+## 三点五、引导配置（setup）
+
+**首次使用**或用户要求个性化时，先运行：
+
+```bash
+python3 huazhirong-legal-affairs/scripts/legal_affairs_cli.py setup status
+```
+
+若 `needsSetup: true`（尚无 `local/credentials.env`），按 `references/onboarding-flow.md` 向用户确认是否覆盖默认值，然后：
+
+```bash
+python3 huazhirong-legal-affairs/scripts/legal_affairs_cli.py setup apply \
+  --decision-maker 老板 --company 华智融 --target skill --verify
+```
+
+可配置项：决策者称呼、公司名、归档目录、境内/境外签约主体（无密码凭据）。
 
 ## 四、工作流程（所有模式通用）
 
@@ -150,9 +185,10 @@ huazhirong-legal-affairs/
 output/合同/审核记录/YYYY-MM-DD_对方名_合同审核.md
 output/合同/采购/审核记录/     # B 模式
 output/合同/人事/审核记录/     # C/D 模式
+output/合同/股权/审核记录/     # F/G 模式
 ```
 
-路径可通过 `LEGAL_AFFAIRS_ARCHIVE_DIR` 环境变量覆盖（见 `scripts/legal_affairs_config.py`）。
+路径可通过 `LEGAL_AFFAIRS_ARCHIVE_DIR` 环境变量或 `setup apply` 覆盖。
 
 ---
 
@@ -186,7 +222,7 @@ output/合同/人事/审核记录/     # C/D 模式
 - 制裁/出口管制/主体异常
 - 群体性裁员、重大劳动仲裁
 - 境外当地雇佣（D 模式深度分析）
-- 股权激励、JV/股权（P2 延后，本版本不覆盖）
+- 股权激励（F）、JV/增资（G）——输出须含「建议外部律师确认」
 
 ---
 
@@ -199,8 +235,9 @@ output/合同/人事/审核记录/     # C/D 模式
 ## 九、评测与自检
 
 ```bash
+python3 huazhirong-legal-affairs/scripts/run_acceptance.py
 python3 huazhirong-legal-affairs/evaluation/run_evals.py
 python3 huazhirong-legal-affairs/scripts/validate_review_output.py --sample
 ```
 
-`evals.json` 含 14 条静态用例，校验路由与 module 引用完整性。
+`evals.json` 含 20 条静态用例；`run_acceptance.py` 为完整验收套件。

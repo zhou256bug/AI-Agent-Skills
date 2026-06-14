@@ -78,31 +78,47 @@ ln -sf ~/Projects/AI-Agent-Skills/huazhirong-legal-affairs \
 
 ---
 
-## 3. 自检
+## 3. 引导配置（首次使用推荐）
 
 ```bash
+python3 ~/Projects/AI-Agent-Skills/huazhirong-legal-affairs/scripts/legal_affairs_cli.py setup status
+python3 ~/Projects/AI-Agent-Skills/huazhirong-legal-affairs/scripts/legal_affairs_cli.py setup apply \
+  --decision-maker 老板 --company 华智融 --target skill --verify
+```
+
+详见 `references/onboarding-flow.md`。无密码凭据；默认值即可开箱使用。
+
+---
+
+## 4. 自检与验收
+
+```bash
+python3 ~/Projects/AI-Agent-Skills/huazhirong-legal-affairs/scripts/run_acceptance.py
 python3 ~/Projects/AI-Agent-Skills/huazhirong-legal-affairs/evaluation/run_evals.py
 python3 ~/Projects/AI-Agent-Skills/huazhirong-legal-affairs/scripts/validate_review_output.py --sample
 ```
 
 ---
 
-## 4. 使用提示
+## 5. 使用提示
 
-1. **先分类**：收到合同后确认我方是甲方/乙方/用人单位
-2. **续签必对比**：老客户续签立即做新旧差异表
-3. **结论先行**：🔴/🟡/🟢 分级输出
-4. **归档**：审核意见写入 `output/合同/`（可通过 `LEGAL_AFFAIRS_ARCHIVE_DIR` 覆盖）
-5. **单 Agent**：本 skill 不委派其他 Agent 或 skill
+1. **首次使用**：运行 `setup status`，按需 `setup apply`
+2. **先分类**：收到合同后确认我方是甲方/乙方/用人单位
+3. **续签必对比**：老客户续签立即做新旧差异表
+4. **结论先行**：🔴/🟡/🟢 分级输出
+5. **归档**：审核意见写入 `output/合同/`
+6. **单 Agent**：本 skill 不委派其他 Agent 或 skill
 
 ---
 
-## 5. 配置（可选）
+## 6. 配置（可选）
 
 | 环境变量 | 默认 | 含义 |
 |----------|------|------|
 | `LEGAL_AFFAIRS_DECISION_MAKER` | 老板 | 决策者称呼 |
 | `LEGAL_AFFAIRS_COMPANY` | 华智融 | 公司名 |
 | `LEGAL_AFFAIRS_ARCHIVE_DIR` | `<skill>/output` | 归档根目录 |
+| `LEGAL_AFFAIRS_ENTITY_CN` | 深圳华智融科技股份有限公司 | 境内签约主体 |
+| `LEGAL_AFFAIRS_ENTITY_HK` | NEW POS GLOBAL HOLDING (HONG KONG) LIMITED | 境外签约主体 |
 
 也可写入 `<skill>/local/credentials.env`（已 gitignore）。

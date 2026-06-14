@@ -1,8 +1,8 @@
 {
-  "version": "0.1.0",
-  "description": "华智融法务合同审核 — 海外经销/采购/用工/解约/POS合规",
+  "version": "0.2.0",
+  "description": "华智融法务合同审核 — 海外经销/采购/用工/解约/POS合规/股权激励/合资增资",
   "knowledge_sources": [
-    "华智融真实案例(7-Labs/Law 173、巴西顾问解约)",
+    "华智融真实案例(7-Labs/Law 173、巴西顾问解约、墨西哥增资)",
     "migration Playbook 改写(去委派+output/)"
   ],
   "evals": [
@@ -95,6 +95,38 @@
       "loads_module": "references/termination-strategies.md"
     },
     {
+      "name": "F-期权授予",
+      "input": "给核心研发签期权授予协议，行权价怎么定、离职怎么处理",
+      "expected_mode": "F",
+      "expected": "F 模式：归属条件、定价依据、回购机制、升级外部律师",
+      "must_have": ["行权", "归属", "外部律师", "🔴"],
+      "loads_module": "modules/equity-incentive.md"
+    },
+    {
+      "name": "F-ESOP计划",
+      "input": "公司要做 ESOP 激励计划，期权池 12%，帮我审结构",
+      "expected_mode": "F",
+      "expected": "F 模式：稀释测算、控制权、治理审批",
+      "must_have": ["期权池", "稀释", "控制权"],
+      "loads_module": "references/equity-incentive-playbook.md"
+    },
+    {
+      "name": "G-墨西哥增资",
+      "input": "墨西哥子公司 H2 需要增资，股东借款和增资哪个好",
+      "expected_mode": "G",
+      "expected": "G 模式：出资结构对比、税务与治理、案例锚点",
+      "must_have": ["增资", "股东借款", "税务"],
+      "loads_module": "modules/corporate-jv.md"
+    },
+    {
+      "name": "G-JV合资",
+      "input": "和当地伙伴设立 JV，股东协议里表决权和退出机制怎么审",
+      "expected_mode": "G",
+      "expected": "G 模式：治理、保留事项、退出估值",
+      "must_have": ["表决权", "退出", "🔴"],
+      "loads_module": "references/corporate-jv-playbook.md"
+    },
+    {
       "name": "H-POS合规",
       "input": "POS 终端出口巴西，合同里 PCI 和收单牌照责任怎么分",
       "expected_mode": "H",
@@ -117,6 +149,22 @@
       "expected": "J 模式：追问合同类型、我方角色、国别",
       "must_have": ["甲方", "乙方", "分类"],
       "loads_module": "references/contract-routing.md"
+    },
+    {
+      "name": "S-setup状态",
+      "input": "配置法务技能，帮我 setup",
+      "expected_mode": "S",
+      "expected": "S 模式：运行 setup status，按 onboarding-flow 引导",
+      "must_have": ["setup", "status", "决策者"],
+      "loads_module": "references/onboarding-flow.md"
+    },
+    {
+      "name": "S-setup应用",
+      "input": "把法务技能决策者改成老板，归档到 output",
+      "expected_mode": "S",
+      "expected": "S 模式：setup apply 写入 local/credentials.env",
+      "must_have": ["setup", "apply", "归档"],
+      "loads_module": "scripts/legal_affairs_cli.py"
     }
   ]
 }

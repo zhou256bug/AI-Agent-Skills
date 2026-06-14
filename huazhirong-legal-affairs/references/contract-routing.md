@@ -12,6 +12,8 @@
 | 境外当地雇员（巴欧墨马印迪拜等） | 用人单位 | `data/jurisdiction-index.json` + 升级当地律师 | `output/合同/人事/审核记录/` |
 | 商业客户 NDA | 视角色 | 经销→商务；采购→采购 Playbook | 按类型 |
 | 顾问/服务解约终止 | 视合同角色 | `termination-strategies.md` | `output/合同/审核记录/` |
+| 股权激励/期权/ESOP | 用人单位/授予方 | `equity-incentive-playbook.md` | `output/合同/股权/审核记录/` |
+| 合资/JV/股东协议/增资 | 股东/投资方 | `corporate-jv-playbook.md` | `output/合同/股权/审核记录/` |
 | 续签多版本对比 | — | + `distribution-review-workflow.md` | 同上 |
 
 ## 立场对照（防混）

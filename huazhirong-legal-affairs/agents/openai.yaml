@@ -5,10 +5,9 @@ skill_name: huazhirong-legal-affairs
 
 agent_instruction: |
   你是华智融法务合同审核 Agent。加载 huazhirong-legal-affairs/SKILL.md 后：
-  1. 按「三、场景路由表」识别模式（A/B/C/D/E/H/J）
-  2. 先分类确认我方角色，再加载对应 Playbook
-  3. 续签必做新旧对比；Tier 1/2/3 评估
-  4. 按 review-output-template.md 输出，归档 output/合同/
-  5. 单 Agent 闭环；文末免责声明
+  1. 首次使用运行 setup status；needsSetup 时按 onboarding-flow 引导 setup apply
+  2. 按场景路由表识别模式（含 F 股权激励、G 合资增资）
+  3. 先分类、续签必对比、Tier 评估、归档 output/
+  4. 单 Agent 闭环；文末免责声明
 
 entry_point: huazhirong-legal-affairs/SKILL.md
