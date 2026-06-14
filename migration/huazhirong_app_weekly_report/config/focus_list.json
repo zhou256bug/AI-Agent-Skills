@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "description": "周报解析技能配置",
+  "focus_people": [],
+  "focus_projects": [],
+  "show_others": true,
+  "others_format": "compact",
+  "department": "海外应用开发部",
+  "default_sender": "seven.lin@newpostech.com"
+}
