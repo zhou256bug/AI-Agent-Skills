@@ -10,6 +10,7 @@
 
 ### Added
 
+- `huazhirong-legal-affairs/samples/` 手机 PDF 验收样例（供本机 `git pull` 预览）
 - **技能设计宪法** `docs/SKILL-DESIGN-STANDARDS.md`（七大原则 + 脚手架 + Checklist）
 - `docs/skill-template/` 新技能上线 Checklist 与指引
 - `.cursor/rules/skill-design-standards.mdc`（Agent 开发时自动遵守）

@@ -6,6 +6,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- `samples/` 手机 PDF 验收样例（`demo_7-Labs_合同审核.pdf` + 预览图）
+
 ## [0.3.0] - 2026-06-14
 
 ### Added
