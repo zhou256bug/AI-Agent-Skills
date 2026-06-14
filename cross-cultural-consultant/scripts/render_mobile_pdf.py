@@ -2,7 +2,7 @@
 """Render mobile-friendly single-column Chinese PDF.
 
 Presets:
-  cielo (default) — Cielo 战备手册 (~284pt)
+  mobile-default (default) — 跨文化手机竖版 PDF (~284pt)
   weekly-report   — 总裁办周报 W22 完整版 (~160mm, 六段结构)
 """
 from __future__ import annotations
@@ -73,7 +73,7 @@ def _font_face_css() -> str:
     return ""
 
 
-CIELO_CSS = """
+MOBILE_CSS = """
 %(font_face)s
 @page { size: %(width_pt)spt %(height_pt)spt; margin: 0; }
 * { box-sizing: border-box; }
@@ -309,8 +309,8 @@ td.status-cell {
 """
 
 PRESETS: dict[str, LayoutPreset] = {
-    "cielo": LayoutPreset(
-        name="cielo",
+    "mobile-default": LayoutPreset(
+        name="mobile-default",
         width_pt=284,
         page_height_pt=24000,
         page_margin_pt="0",
@@ -325,8 +325,8 @@ PRESETS: dict[str, LayoutPreset] = {
         pad_bottom=30,
         brand_color="#006341",
         title_color="#006341",
-        css_template=CIELO_CSS,
-        default_footer="手机竖版 284pt · NotoSC · Cielo布局",
+        css_template=MOBILE_CSS,
+        default_footer="手机竖版 284pt · NotoSC",
     ),
     "weekly-report": LayoutPreset(
         name="weekly-report",
@@ -637,7 +637,7 @@ def maybe_gs_optimize(pdf_path: Path) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Mobile Chinese PDF (presets: cielo, weekly-report)"
+        description="Mobile Chinese PDF (presets: mobile-default, weekly-report)"
     )
     parser.add_argument("--title", required=True, help="Report title (Chinese)")
     parser.add_argument("--output", required=True, type=Path, help="Output .pdf path")
@@ -648,7 +648,7 @@ def main() -> int:
     parser.add_argument(
         "--preset",
         choices=sorted(PRESETS),
-        default="cielo",
+        default="mobile-default",
         help="Layout preset (weekly-report = 总裁办周报 W22 格式)",
     )
     parser.add_argument(

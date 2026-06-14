@@ -7,29 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Planned (P2, deferred)
+
+> 通用化文档抛光；**不影响技能触发与交付主路径**，合并后可择机处理。
+
+- `README.md`：适用对象由「华智融高管」改为「中国管理者 / B2B 出海高管」；PagBank 等触发示例泛化
+- `templates/A4-report-template.html`：页脚去掉 Hermes 平台字样，改为平台无关 Skill 名
+- `evals.json`：补 C 来访 / E 经营 / B6 话术结构用例；将 `C-战略-沙特建团队` 更名为 `A+战略-沙特建团队`（当前路由实为 A+战略）
+- `scripts/render_mobile_pdf.py`：`weekly-report` preset 标注为跨技能残留或迁出（跨文化主路径仅用 `mobile-default`）
+- `SKILL.md` §十三：「老板要手机 PDF」可改为「用户要求」（可选口吻抛光）
+
+## [0.8.1] - 2026-06-13
+
+### Changed
+
+- `render_mobile_pdf.py` 默认 preset `cielo` 更名为 `mobile-default`（版式不变）；SKILL §十三 文案同步
+- 删除已合并的占位文件 `references/F-mode-brazil-cielo-2026-06-04.md`
+
+## [0.8.0] - 2026-06-14
+
 ### Added
 
 - 平台注册脚手架：`agents/openclaw.yaml`、`agents/hermes.yaml`、`agents/openai.yaml`
 - `references/openclaw-hermes-registration.md`：OpenClaw / Hermes 复制即用注册文档
 - `bundles/cross-cultural-consultant.hermes.yaml`：Hermes `/cross-cultural-consultant` bundle
 - `evaluation/run_evals.py`：纯标准库的静态评测 / 自检 harness（校验 evals.json 结构与 module 引用）
+- `scripts/run_integration_test.py`：端到端集成测试（路由、Delta、PDF）
 - `CHANGELOG.md`、`.gitignore`
-- SKILL.md 新增「零、开箱即用与注册」段落
+- SKILL.md「零、开箱即用与注册」与「十四、C 模式会后 CRM」
+- C 模式 CRM：`references/crm-workflow.md`、`crm-card-note-template.md`、`crm-meeting-note-template.md`
+- `scripts/ocr_card.py`（名片 OCR，可选 tesseract）
 
 ### Changed
 
-- 平台解耦：手机 PDF（SKILL.md §十三）统一走 skill 内 `scripts/render_mobile_pdf.py`，移除 `$HERMES_HOME/tools/...` 路径依赖
-- 归档输出路径由 `newpos/...` 改为可配置的 `output/...`（operative 段落；历史案例参考文件保持原样）
-- 版本号对齐为 0.7.1（frontmatter / 正文标题 / 输出脚注 / README / evals.json 一致）
+- **定版 0.8.0**：平台解耦、单 Agent 闭环、`output/` 本地归档规范
+- C 模式会后改为单 Agent 闭环：移除大为/emma/Hermes 委派；Agent 直接写 `output/crm/`
+- 移除 `ericstudio` Mac 本机路径与全部 `newpos/` 引用；`pdf-trip-report-workflow.md` 与 §十三 对齐
+- 去语境化（人名）：`菜头` → `老板`（`SKILL.md` 与相关 `references/`）
+- 手机 PDF 统一走 `scripts/render_mobile_pdf.py`，移除 `$HERMES_HOME/tools/...` 依赖
+- 归档路径统一为技能内 `output/`（出差报告 / 来访战备 / 市场 / crm）
+- `SKILL.md` §九 / §十二：`v0.3.0-backup` 引用改为 `migration/cross-cultural-consultant/.v0.3.0-backup/`
+- `A-mode-japan-25th-anniversary.md`、`F-mode-brazil-fernando-termination.md`：PDF 流程改为 `render_mobile_pdf.py`
+- `README.md` 更新：C/E/B6、`output/` 树、`ocr_card.py`、可选依赖与自检命令
 
 ### Removed
 
-- `references/hofstede-dimensions.json`（无效占位符，非合法 JSON，含本机绝对路径）——以 `data/hofstede-dimensions.json` 为唯一数据源
-- 提升到仓库根的副本不含 `.v0.3.0-backup/`（历史备份仍保留在 `migration/cross-cultural-consultant/`）
+- `references/hofstede-dimensions.json`（无效占位）——以 `data/hofstede-dimensions.json` 为唯一数据源
+- 提升到仓库根的副本不含 `.v0.3.0-backup/`（历史备份在 `migration/cross-cultural-consultant/`）
 
-### Notes（待后续讨论，本轮未改）
+### Notes
 
-- 部分参考案例文件仍含特定同事/公司语境（菜头、emma/大为 委派、newpos/Obsidian 路径），按约定留待单独讨论后再处理
+- `references/` 中华智融、9010、PagBank 等案例为高管场景设计，**有意保留**
 
 ## [0.7.1] - 2026-06-09
 
