@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "华智融法务合同审核 — 海外经销/采购/用工/解约/POS合规/股权激励/合资增资",
   "knowledge_sources": [
     "华智融真实案例(7-Labs/Law 173、巴西顾问解约、墨西哥增资)",
@@ -165,6 +165,14 @@
       "expected": "S 模式：setup apply 写入 local/credentials.env",
       "must_have": ["setup", "apply", "归档"],
       "loads_module": "scripts/legal_affairs_cli.py"
+    },
+    {
+      "name": "P-PDF手机版",
+      "input": "把这份合同审核意见做成手机 PDF 发给我",
+      "expected_mode": "P",
+      "expected": "调用 render_review_pdf.py 生成 284pt 竖版 PDF 并推送",
+      "must_have": ["PDF", "render_review_pdf", "手机"],
+      "loads_module": "references/pdf-review-workflow.md"
     }
   ]
 }

@@ -264,6 +264,10 @@ def run_doctor() -> dict[str, Any]:
         SKILL_ROOT / "modules" / "contract-distribution.md",
         SKILL_ROOT / "modules" / "equity-incentive.md",
         SKILL_ROOT / "modules" / "corporate-jv.md",
+        SKILL_ROOT / "references" / "emoji-output-guide.md",
+        SKILL_ROOT / "references" / "pdf-review-workflow.md",
+        SKILL_ROOT / "scripts" / "render_mobile_pdf.py",
+        SKILL_ROOT / "scripts" / "render_review_pdf.py",
     ]
     for f in required_files:
         if not f.is_file():

@@ -22,6 +22,7 @@ sys.path.insert(0, str(SCRIPTS))
 
 PASS = 0
 FAIL = 0
+SKIP = 0
 RESULTS: list[dict] = []
 
 
@@ -32,6 +33,12 @@ def record(case_id: str, name: str, ok: bool, detail: str = "") -> None:
     else:
         FAIL += 1
     RESULTS.append({"id": case_id, "name": name, "ok": ok, "detail": str(detail)[:160]})
+
+
+def skip(case_id: str, name: str, detail: str = "") -> None:
+    global SKIP
+    SKIP += 1
+    RESULTS.append({"id": case_id, "name": name, "ok": None, "detail": str(detail)[:160]})
 
 
 def _load(mod_name: str, filename: str):
@@ -51,7 +58,9 @@ def main() -> int:
         "modules/equity-incentive.md", "modules/corporate-jv.md",
         "references/negotiation-playbook.md", "references/equity-incentive-playbook.md",
         "references/corporate-jv-playbook.md", "references/onboarding-flow.md",
+        "references/emoji-output-guide.md", "references/pdf-review-workflow.md",
         "scripts/legal_affairs_cli.py", "scripts/legal_affairs_lib.py",
+        "scripts/render_mobile_pdf.py", "scripts/render_review_pdf.py",
         "evaluation/run_evals.py",
     ]
     for rel in required:
@@ -64,7 +73,7 @@ def main() -> int:
         record(f"CL-{word[:8]}", f"SKILL.md 不含 {word}", word not in skill_md)
 
     # ---- 版本号 ----
-    record("VER01", "SKILL.md version 0.2.0", "version: 0.2.0" in skill_md)
+    record("VER01", "SKILL.md version 0.3.0", "version: 0.3.0" in skill_md)
 
     # ---- config 默认值 ----
     import legal_affairs_config as cfg  # noqa: E402
@@ -128,6 +137,48 @@ def main() -> int:
     )
     record("CLI03", "cli doctor 退出码 0", r_doc.returncode == 0, r_doc.stderr[:120])
 
+    record("EMO01", "emoji-output-guide 存在", (SKILL / "references/emoji-output-guide.md").is_file())
+    emoji_guide = (SKILL / "references/emoji-output-guide.md").read_text(encoding="utf-8")
+    record("EMO02", "emoji 指南含 📌", "📌" in emoji_guide)
+    record("EMO03", "pdf-review-workflow 存在", (SKILL / "references/pdf-review-workflow.md").is_file())
+
+    render_py = SCRIPTS / "render_mobile_pdf.py"
+    render_review = SCRIPTS / "render_review_pdf.py"
+    record("PDF00", "render_mobile_pdf.py 存在", render_py.is_file())
+    record("PDF01", "render_review_pdf.py 存在", render_review.is_file())
+
+    import shutil
+    have_weasy = shutil.which("weasyprint") is not None
+    try:
+        import fitz  # noqa: F401
+        have_fitz = True
+    except Exception:
+        have_fitz = False
+
+    if have_weasy and have_fitz and render_review.is_file():
+        with tempfile.TemporaryDirectory() as td:
+            body = Path(td) / "review.md"
+            body.write_text(
+                "## ⚖️ 测试\n\n**📌 结论**：测试\n\n### 🔴 必须改\n- x\n\n> ⚗️ **免责声明**：测试\n",
+                encoding="utf-8",
+            )
+            outpdf = Path(td) / "t.pdf"
+            r = subprocess.run(
+                [sys.executable, str(render_review), "--title", "验收测试",
+                 "--body-md", str(body), "--output", str(outpdf), "--mode", "A"],
+                capture_output=True, text=True, timeout=120,
+            )
+            record("PDF02", "render_review_pdf 退出码 0", r.returncode == 0, r.stderr[:120])
+            if outpdf.is_file():
+                import fitz
+                w_mm = fitz.open(str(outpdf))[0].cropbox.width / 72 * 25.4
+                record("PDF03", "PDF 宽约 100mm", 96 <= w_mm <= 104, f"{w_mm:.1f}mm")
+            else:
+                record("PDF03", "PDF 输出存在", False)
+    else:
+        skip("PDF02", "render_review_pdf 渲染", f"weasyprint={have_weasy} PyMuPDF={have_fitz}")
+        skip("PDF03", "PDF 宽度校验", "render 依赖缺失")
+
     # ---- evals harness ----
     r_evals = subprocess.run(
         [sys.executable, str(SKILL / "evaluation" / "run_evals.py")],
@@ -137,7 +188,7 @@ def main() -> int:
     record("EVL01", "run_evals 退出码 0", r_evals.returncode == 0, r_evals.stdout[-200:])
 
     evals = json.loads((SKILL / "evals.json").read_text(encoding="utf-8"))
-    record("EVL02", "evals >= 20 条", len(evals.get("evals", [])) >= 20)
+    record("EVL02", "evals >= 21 条", len(evals.get("evals", [])) >= 21)
     modes = {e.get("expected_mode") for e in evals.get("evals", [])}
     record("EVL03", "含 F/G 模式", "F" in modes and "G" in modes)
     record("EVL04", "含 S/setup 模式", "S" in modes)
@@ -160,10 +211,13 @@ def main() -> int:
     print(f"\n{'ID':<12} {'OK':<6} 用例")
     print("-" * 72)
     for r in RESULTS:
-        mark = "✅" if r["ok"] else "❌"
+        if r["ok"] is None:
+            mark = "⏭️ SKIP"
+        else:
+            mark = "✅" if r["ok"] else "❌"
         print(f"{r['id']:<12} {mark:<6} {r['name']}" + (f"  [{r['detail']}]" if r["detail"] else ""))
     print("-" * 72)
-    print(f"PASS={PASS}  FAIL={FAIL}  (DECISION_MAKER={cfg.DECISION_MAKER}, COMPANY={cfg.COMPANY})")
+    print(f"PASS={PASS}  FAIL={FAIL}  SKIP={SKIP}  (DECISION_MAKER={cfg.DECISION_MAKER}, COMPANY={cfg.COMPANY})")
     return 0 if FAIL == 0 else 1
 
 

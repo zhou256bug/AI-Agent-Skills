@@ -6,6 +6,20 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-14
+
+### Added
+
+- **Emoji 输出规范**：`references/emoji-output-guide.md`（📌🔴🟡🟢👉⚗️🚨 等）
+- **手机 PDF**：vendored `scripts/render_mobile_pdf.py` + `scripts/render_review_pdf.py`
+- `references/pdf-review-workflow.md`（与跨文化 `mobile-default` 同款 284pt 竖版）
+- 输出模板、validate 样例、验收套件同步 emoji 与 PDF 检查
+
+### Changed
+
+- 版本升至 **0.3.0**；SKILL §七 手机 PDF 铁律
+- 法务 PDF 默认品牌色 `#1a365d`
+
 ## [0.2.0] - 2026-06-13
 
 ### Added
@@ -43,5 +57,6 @@
 
 - migration 中的委派链（方律/大为/delegate_task）、`newpos/` 路径、`contract-review-anthropic`、`tabular-review-lawvable`
 
+[0.3.0]: https://github.com/zhou256bug/AI-Agent-Skills/compare/huazhirong-legal-affairs-0.2.0...cursor/huazhirong-legal-affairs-3368
 [0.2.0]: https://github.com/zhou256bug/AI-Agent-Skills/compare/huazhirong-legal-affairs-0.1.0...cursor/huazhirong-legal-affairs-3368
 [0.1.0]: https://github.com/zhou256bug/AI-Agent-Skills/compare/main...cursor/huazhirong-legal-affairs-3368

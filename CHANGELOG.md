@@ -8,6 +8,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- `huazhirong-legal-affairs` **v0.3.0**：emoji 输出规范 + 手机 PDF（`render_review_pdf.py`，参考跨文化 `mobile-default`）
+
 ### Added
 
 - `huazhirong-legal-affairs` **v0.2.0**：P2 F/G（股权激励/合资增资）、setup 引导配置、`run_acceptance.py` 验收套件、evals 20 条

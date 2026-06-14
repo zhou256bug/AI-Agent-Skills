@@ -2,7 +2,12 @@
 
 华智融合同审核 Agent Skill — 海外经销、采购供货、境内用工、顾问解约、POS 合规、股权激励、合资增资。
 
-**版本**：0.2.0 | **slash**：`/legal-affairs` | **凭据**：无（setup 配置业务偏好）
+**版本**：0.3.0 | **slash**：`/legal-affairs` | **凭据**：无（setup 配置业务偏好）
+
+## 输出增强
+
+- **Emoji 标记**：`📌 结论`、`🔴🟡🟢` 分级、`👉` 下一步、`⚗️` 免责声明等（见 `references/emoji-output-guide.md`）
+- **📱 手机 PDF**：`scripts/render_review_pdf.py`（vendored `render_mobile_pdf.py`，与跨文化同款 284pt 竖版）
 
 ## 能力范围
 
@@ -39,6 +44,10 @@ python3 huazhirong-legal-affairs/scripts/legal_affairs_cli.py setup apply --veri
 
 # 评测
 python3 huazhirong-legal-affairs/evaluation/run_evals.py
+
+# 手机 PDF（可选依赖 weasyprint/gs/PyMuPDF）
+python3 huazhirong-legal-affairs/scripts/render_review_pdf.py \
+  --title "7-Labs 合同审核" --body-md <审核.md> --party "7-Labs" --mode A
 ```
 
 ### Hermes

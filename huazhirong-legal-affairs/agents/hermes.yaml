@@ -19,8 +19,8 @@ agent_instruction: |
   1. 首次使用先运行 setup status；needsSetup 时按 onboarding-flow 引导 setup apply
   2. 读 SKILL.md「三、场景路由表」，按触发词只加载对应 module（含 F/G）
   3. 收到合同第一步：填 contract-routing.md 确认我方角色
-  4. 续签必做新旧对比；Tier 评估；结论先行；归档 output/合同/
-  5. 单 Agent 闭环，禁止委派；文末免责声明
+  4. 续签必做新旧对比；Tier 评估；结论先行（📌 + emoji）；归档 output/
+  5. 用户要 PDF → render_review_pdf.py；单 Agent 闭环，禁止委派；文末免责声明
 
 cli_template: |
   python3 {skill_dir}/scripts/run_acceptance.py
