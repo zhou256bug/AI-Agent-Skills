@@ -13,6 +13,7 @@
 | [`aliyun-enterprise-mail`](aliyun-enterprise-mail/) | 阿里企业邮箱 IMAP 读信,支持 Agent 对话式引导配置(`setup status` / `apply`) | 需(邮箱 + 客户端授权密码,本地配置) | 无(纯标准库) | ✅ 可用 |
 | [`cross-cultural-consultant`](cross-cultural-consultant/) | 跨文化管理顾问:出国前画像 / 出国中场景问答 / 回国后复盘 / 来访接待,基于 Hofstede 六维(119 国)+ 港大 EMBA6611 框架 | 无 | PDF 输出需 weasyprint/ghostscript/PyMuPDF | ✅ 可用 |
 | [`huazhirong-management-weekly-report`](huazhirong-management-weekly-report/) | 管理团队周报汇编(独立完整):内置取信→汇编四段→长条 PDF→多通道投递,一条命令编排且失败可断点续跑 | 需(收件箱 IMAP,本地配置) | PDF 需 weasyprint/ghostscript/PyMuPDF;企业微信/飞书投递需 webhook | ✅ 可用 |
+| [`huazhirong-legal-affairs`](huazhirong-legal-affairs/) | 华智融法务合同审核:海外经销/采购/境内用工/解约/POS合规/股权;emoji+手机PDF;单 Agent 闭环 | 无 | PDF 需 weasyprint/ghostscript/PyMuPDF | ✅ 可用 |
 | `migration/huazhirong-business-support` | 华智融商务支持总入口原始迁移素材 | — | — | 🚧 待规范化(强耦合,后续讨论) |
 
 > `migration/` 保留尚未规范化的原始技能素材,**不建议直接注册使用**;规范化后的技能会提升到仓库根目录。
@@ -25,9 +26,16 @@
 AI-Agent-Skills/
 ├── README.md                 # 本文件
 ├── CHANGELOG.md              # 仓库级变更(Keep a Changelog + SemVer)
+├── docs/
+│   ├── SKILL-DESIGN-STANDARDS.md   # 技能设计宪法（硬性规则）
+│   └── skill-template/             # 新技能 Checklist 与指引
+├── scripts/
+│   └── validate_skill_scaffold.py  # 仓库级技能脚手架校验
 ├── LICENSE                   # Apache-2.0
 ├── aliyun-enterprise-mail/   # 技能:阿里企业邮箱读信
 ├── cross-cultural-consultant/# 技能:跨文化管理顾问
+├── huazhirong-legal-affairs/ # 技能:华智融法务
+├── huazhirong-management-weekly-report/
 └── migration/                # 原始迁移素材(待规范化)
 ```
 
@@ -81,14 +89,38 @@ skills:
 
 ## 技能开发规范
 
-新增或规范化一个技能时,对齐以下约定:
+> **硬性规则全文**：[docs/SKILL-DESIGN-STANDARDS.md](docs/SKILL-DESIGN-STANDARDS.md)  
+> **新技能 Checklist**：[docs/skill-template/CHECKLIST.md](docs/skill-template/CHECKLIST.md)  
+> **Agent 自动遵守**：`.cursor/rules/skill-design-standards.mdc`
 
-1. **入口 `SKILL.md`**:YAML frontmatter 至少含 `name`、`description`(写清 *Use when* 触发词)、`metadata.{openclaw,hermes}`;正文只做路由,细节拆到子文件按需加载。
-2. **自包含**:运行所需的数据 / 知识 / 脚本放进技能目录,**不依赖特定主机的绝对路径或平台专有脚本路径**(如 `$HERMES_HOME/...`)。
-3. **平台脚手架**:提供 `agents/{openclaw,hermes,openai}.yaml` 与 `references/openclaw-hermes-registration.md`,确保 clone 即可注册。
-4. **变更记录**:技能目录内维护 `CHANGELOG.md`,仓库级变更同时记入根 `CHANGELOG.md`;均遵循 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) + [SemVer](https://semver.org/)。
-5. **可选依赖显式声明**:非核心能力(如 PDF 渲染)所需的第三方依赖在 `SKILL.md` 与注册文档中标注为"可选",缺失时核心流程不受影响。
-6. **自检脚本**:尽量提供纯标准库的校验/自检脚本(如 `scripts/validate-data.py`、`evaluation/run_evals.py`),便于 clone 后快速验证。
+### 七大原则（摘要）
+
+| 原则 | 要点 |
+|------|------|
+| **通用化** | 无平台专有路径、无委派链、无 `newpos/` |
+| **独立跑通** | 单 skill 可注册自检；`run_acceptance.py` 或 `run_evals.py` |
+| **开箱即用** | 默认值可跑；知识/data 自包含 |
+| **参数化** | `scripts/*_config.py` + 环境变量 |
+| **引导配置化** | 有凭据时 `setup status` / `setup apply` |
+| **Emoji 化** | 报告输出类：`emoji-output-guide.md`，`📌🔴🟡🟢👉` |
+| **手机体验化** | 长报告类：`render_mobile_pdf.py` + PDF 工作流 |
+
+### 基础约定
+
+1. **入口 `SKILL.md`**：frontmatter 含 `name`、`description`（*Use when* 触发词）、`metadata.{openclaw,hermes}`；正文只做路由。
+2. **自包含**：不依赖 `$HERMES_HOME/...` 或本机绝对路径。
+3. **单 Agent 闭环**：禁止 `delegate_task` 与跨 skill 委派。
+4. **平台脚手架**：`agents/{openclaw,hermes,openai}.yaml` + `openclaw-hermes-registration.md`。
+5. **变更记录**：技能级 + 根级 `CHANGELOG.md`（Keep a Changelog + SemVer）。
+6. **可选依赖显式声明**：PDF 等缺失时核心流程仍可用。
+7. **合并前校验**：
+
+```bash
+python3 scripts/validate_skill_scaffold.py
+python3 <skill>/scripts/run_acceptance.py   # 或 evaluation/run_evals.py
+```
+
+**参考技能**：`cross-cultural-consultant` · `aliyun-enterprise-mail` · `huazhirong-management-weekly-report` · `huazhirong-legal-affairs`
 
 ---
 

@@ -1,0 +1,33 @@
+# Hermes Agent 注册片段
+
+display_name: "华智融法务"
+skill_name: huazhirong-legal-affairs
+slash_command: /legal-affairs
+
+hermes_config_yaml: |
+  skills:
+    external_dirs:
+      - ~/Projects/AI-Agent-Skills
+
+hermes_cli: |
+  hermes chat --toolsets terminal,skills -q "/legal-affairs 7-Labs 续签合同新增了 Law 173，帮我审核"
+
+bundle_file: bundles/legal-affairs.hermes.yaml
+
+agent_instruction: |
+  加载 huazhirong-legal-affairs 后：
+  1. 首次使用先运行 setup status；needsSetup 时按 onboarding-flow 引导 setup apply
+  2. 读 SKILL.md「三、场景路由表」，按触发词只加载对应 module（含 F/G）
+  3. 收到合同第一步：填 contract-routing.md 确认我方角色
+  4. 续签必做新旧对比；Tier 评估；结论先行（📌 + emoji）；归档 output/
+  5. 用户要 PDF → render_review_pdf.py；单 Agent 闭环，禁止委派；文末免责声明
+
+cli_template: |
+  python3 {skill_dir}/scripts/run_acceptance.py
+  python3 {skill_dir}/scripts/legal_affairs_cli.py setup status
+  python3 {skill_dir}/evaluation/run_evals.py
+
+install_local: |
+  mkdir -p ~/.hermes/skills
+  ln -sf ~/Projects/AI-Agent-Skills/huazhirong-legal-affairs \
+    ~/.hermes/skills/huazhirong-legal-affairs

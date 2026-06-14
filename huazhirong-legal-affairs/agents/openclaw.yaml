@@ -1,0 +1,36 @@
+# OpenClaw Agent 注册片段
+
+display_name: "华智融法务"
+skill_name: huazhirong-legal-affairs
+slash_command: /legal-affairs
+
+openclaw_json: |
+  {
+    "skills": {
+      "load": {
+        "extraDirs": ["~/Projects/AI-Agent-Skills"],
+        "watch": true
+      },
+      "entries": {
+        "huazhirong-legal-affairs": {
+          "enabled": true
+        }
+      }
+    },
+    "agents": {
+      "defaults": {
+        "skills": ["huazhirong-legal-affairs"]
+      }
+    }
+  }
+
+agent_instruction: |
+  加载 huazhirong-legal-affairs 后：
+  1. 首次使用先 setup status；needsSetup 时引导 setup apply --verify
+  2. 按 SKILL.md 场景路由表识别模式（A/B/C/D/E/F/G/H/J/S）
+  3. 先分类确认角色，续签必对比，Tier 评估，归档 output/
+  4. 单 Agent 闭环，禁止委派
+
+cli_template: |
+  python3 {skill_dir}/scripts/run_acceptance.py
+  python3 {skill_dir}/scripts/legal_affairs_cli.py setup status

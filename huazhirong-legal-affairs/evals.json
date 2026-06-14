@@ -1,0 +1,178 @@
+{
+  "version": "0.3.0",
+  "description": "华智融法务合同审核 — 海外经销/采购/用工/解约/POS合规/股权激励/合资增资",
+  "knowledge_sources": [
+    "华智融真实案例(7-Labs/Law 173、巴西顾问解约、墨西哥增资)",
+    "migration Playbook 改写(去委派+output/)"
+  ],
+  "evals": [
+    {
+      "name": "A-7-Labs续签-Law173",
+      "input": "7-Labs SRL 多米尼加经销合同续签，新版新增了 Law 173 登记条款，帮我审核",
+      "expected_mode": "A",
+      "expected": "A 模式：识别乙方立场、Law 173 为 P0、要求 just cause 终止条件、续签新旧对比",
+      "must_have": ["Law 173", "just cause", "乙方", "🔴"],
+      "loads_module": "modules/contract-distribution.md"
+    },
+    {
+      "name": "A-海外经销-新签",
+      "input": "巴西新客户 POS 独家代理协议，我方是卖方，请审核付款和管辖条款",
+      "expected_mode": "A",
+      "expected": "A 模式：乙方立场、Tier 评估付款/管辖、15% 法则",
+      "must_have": ["乙方", "付款", "管辖", "🔴"],
+      "loads_module": "modules/contract-distribution.md"
+    },
+    {
+      "name": "A-续签对比",
+      "input": "老客户续签，旧版没有本土保护法，新版新增了，直接对比两个版本",
+      "expected_mode": "A",
+      "expected": "立即做新旧差异表，标记旧无新有",
+      "must_have": ["续签", "旧", "新", "本土保护法"],
+      "loads_module": "references/distribution-review-workflow.md"
+    },
+    {
+      "name": "B-元器件采购",
+      "input": "向供应商采购 POS 主控芯片，我方是买方，请审核验收和 IP 条款",
+      "expected_mode": "B",
+      "expected": "B 模式：甲方立场、验收程序、定制 IP 归华智融",
+      "must_have": ["甲方", "验收", "知识产权", "🔴"],
+      "loads_module": "modules/contract-procurement.md"
+    },
+    {
+      "name": "B-OEM整机",
+      "input": "OEM 代工整机采购合同，100% 预付无担保，帮我看",
+      "expected_mode": "B",
+      "expected": "B 模式：100% 预付标 🔴、质保与终止权",
+      "must_have": ["预付", "🔴", "甲方"],
+      "loads_module": "references/procurement-playbook.md"
+    },
+    {
+      "name": "C-劳动合同新签",
+      "input": "新员工劳动合同，3 年期限约定 4 个月试用期，帮我审核",
+      "expected_mode": "C",
+      "expected": "C 模式：试用期上限 6 个月、超期标 🔴",
+      "must_have": ["试用期", "🔴", "社保"],
+      "loads_module": "modules/labor-domestic.md"
+    },
+    {
+      "name": "C-竞业限制",
+      "input": "普通销售岗位竞业限制协议，没有经济补偿，能签吗",
+      "expected_mode": "C",
+      "expected": "C 模式：竞业无补偿标 🔴",
+      "must_have": ["竞业", "补偿", "🔴"],
+      "loads_module": "references/labor-cn-playbook.md"
+    },
+    {
+      "name": "C-劳务防劳动关系",
+      "input": "顾问协议要求每天打卡坐班，会不会被认定劳动关系",
+      "expected_mode": "C",
+      "expected": "C 模式：人格从属性分析、标 🔴",
+      "must_have": ["劳动关系", "🔴"],
+      "loads_module": "modules/labor-domestic.md"
+    },
+    {
+      "name": "D-巴西用工简引",
+      "input": "华智融巴西子公司招聘当地员工，劳动合同模板帮我初审",
+      "expected_mode": "D",
+      "expected": "D 模式：加载 jurisdiction-index BR、升级当地律师",
+      "must_have": ["巴西", "CLT", "当地律师"],
+      "loads_module": "data/jurisdiction-index.json"
+    },
+    {
+      "name": "E-巴西顾问解约",
+      "input": "巴西商业顾问合同有 90 天通知期和一年锁定期，现在想解约，最早什么时候能生效",
+      "expected_mode": "E",
+      "expected": "E 模式：通知≠解除、锁定期分析、方案对比",
+      "must_have": ["通知", "锁定期", "方案"],
+      "loads_module": "modules/contract-termination.md"
+    },
+    {
+      "name": "E-协商解除",
+      "input": "顾问解约能不能一次性给和解金提前退出",
+      "expected_mode": "E",
+      "expected": "E 模式：协商解除 vs 通知程序成本对比",
+      "must_have": ["协商", "成本", "风险"],
+      "loads_module": "references/termination-strategies.md"
+    },
+    {
+      "name": "F-期权授予",
+      "input": "给核心研发签期权授予协议，行权价怎么定、离职怎么处理",
+      "expected_mode": "F",
+      "expected": "F 模式：归属条件、定价依据、回购机制、升级外部律师",
+      "must_have": ["行权", "归属", "外部律师", "🔴"],
+      "loads_module": "modules/equity-incentive.md"
+    },
+    {
+      "name": "F-ESOP计划",
+      "input": "公司要做 ESOP 激励计划，期权池 12%，帮我审结构",
+      "expected_mode": "F",
+      "expected": "F 模式：稀释测算、控制权、治理审批",
+      "must_have": ["期权池", "稀释", "控制权"],
+      "loads_module": "references/equity-incentive-playbook.md"
+    },
+    {
+      "name": "G-墨西哥增资",
+      "input": "墨西哥子公司 H2 需要增资，股东借款和增资哪个好",
+      "expected_mode": "G",
+      "expected": "G 模式：出资结构对比、税务与治理、案例锚点",
+      "must_have": ["增资", "股东借款", "税务"],
+      "loads_module": "modules/corporate-jv.md"
+    },
+    {
+      "name": "G-JV合资",
+      "input": "和当地伙伴设立 JV，股东协议里表决权和退出机制怎么审",
+      "expected_mode": "G",
+      "expected": "G 模式：治理、保留事项、退出估值",
+      "must_have": ["表决权", "退出", "🔴"],
+      "loads_module": "references/corporate-jv-playbook.md"
+    },
+    {
+      "name": "H-POS合规",
+      "input": "POS 终端出口巴西，合同里 PCI 和收单牌照责任怎么分",
+      "expected_mode": "H",
+      "expected": "H 模式：PCI 责任矩阵、本地收单牌照",
+      "must_have": ["PCI", "牌照", "责任"],
+      "loads_module": "references/pos-payment-compliance.md"
+    },
+    {
+      "name": "H-SDK许可",
+      "input": "经销合同里 SDK 授权范围怎么审",
+      "expected_mode": "H",
+      "expected": "H 模式：territory + term 限定、禁止反向工程",
+      "must_have": ["SDK", "许可", "IP"],
+      "loads_module": "references/pos-contract-clauses.md"
+    },
+    {
+      "name": "J-分类澄清",
+      "input": "帮我审个合同",
+      "expected_mode": "J",
+      "expected": "J 模式：追问合同类型、我方角色、国别",
+      "must_have": ["甲方", "乙方", "分类"],
+      "loads_module": "references/contract-routing.md"
+    },
+    {
+      "name": "S-setup状态",
+      "input": "配置法务技能，帮我 setup",
+      "expected_mode": "S",
+      "expected": "S 模式：运行 setup status，按 onboarding-flow 引导",
+      "must_have": ["setup", "status", "决策者"],
+      "loads_module": "references/onboarding-flow.md"
+    },
+    {
+      "name": "S-setup应用",
+      "input": "把法务技能决策者改成老板，归档到 output",
+      "expected_mode": "S",
+      "expected": "S 模式：setup apply 写入 local/credentials.env",
+      "must_have": ["setup", "apply", "归档"],
+      "loads_module": "scripts/legal_affairs_cli.py"
+    },
+    {
+      "name": "P-PDF手机版",
+      "input": "把这份合同审核意见做成手机 PDF 发给我",
+      "expected_mode": "P",
+      "expected": "调用 render_review_pdf.py 生成 284pt 竖版 PDF 并推送",
+      "must_have": ["PDF", "render_review_pdf", "手机"],
+      "loads_module": "references/pdf-review-workflow.md"
+    }
+  ]
+}

@@ -10,6 +10,20 @@
 
 ### Added
 
+- **技能设计宪法** `docs/SKILL-DESIGN-STANDARDS.md`（七大原则 + 脚手架 + Checklist）
+- `docs/skill-template/` 新技能上线 Checklist 与指引
+- `.cursor/rules/skill-design-standards.mdc`（Agent 开发时自动遵守）
+- 仓库级 `scripts/validate_skill_scaffold.py`（校验根目录技能最低硬性文件）
+
+### Changed
+
+- 根 `README.md` 技能开发规范扩展为七大原则摘要并链到标准文档
+- `huazhirong-legal-affairs` **v0.3.0**：emoji 输出规范 + 手机 PDF（`render_review_pdf.py`，参考跨文化 `mobile-default`）
+- 规范化技能 `huazhirong-legal-affairs`(提升至仓库根,独立完整):
+  - P0：海外经销(A)、采购供货(B)、境内用工(C)、境外用工简引(D)、解约终止(E)、POS合规(H)
+  - 从 migration Playbook 改写(去委派/newpos/方律/大为);真实案例结构(7-Labs/Law 173、巴西顾问解约)
+  - `scripts/legal_affairs_config.py`、`scripts/validate_review_output.py`、`evaluation/run_evals.py`(14 用例)
+  - 平台脚手架 `agents/{openclaw,hermes,openai}.yaml`、`bundles/legal-affairs.hermes.yaml`
 - 仓库根专业 `README.md`(技能一览 / 注册快速开始 / 技能开发规范 / 安全与凭据)
 - `cross-cultural-consultant` C 模式会后 CRM：`references/crm-workflow.md`、`crm-card-note-template.md`、`crm-meeting-note-template.md`、`scripts/ocr_card.py`（单 Agent 写 `output/crm/`，不委派外部 profile/skill）
 - `cross-cultural-consultant` `scripts/run_integration_test.py`（端到端集成测试 36 项）

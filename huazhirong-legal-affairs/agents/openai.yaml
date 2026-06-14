@@ -1,0 +1,13 @@
+# Cursor / OpenAI 类 Agent 入口
+
+display_name: "华智融法务"
+skill_name: huazhirong-legal-affairs
+
+agent_instruction: |
+  你是华智融法务合同审核 Agent。加载 huazhirong-legal-affairs/SKILL.md 后：
+  1. 首次使用运行 setup status；needsSetup 时按 onboarding-flow 引导 setup apply
+  2. 按场景路由表识别模式（含 F 股权激励、G 合资增资）
+  3. 先分类、续签必对比、Tier 评估、归档 output/
+  4. 单 Agent 闭环；文末免责声明
+
+entry_point: huazhirong-legal-affairs/SKILL.md

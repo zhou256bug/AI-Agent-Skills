@@ -1,0 +1,56 @@
+{
+  "version": "0.1.0",
+  "description": "多法域用工索引（P0 轻量版，D 模式简引）",
+  "disclaimer": "各国劳动法差异大；本表为初审清单，复杂案件须当地律师确认",
+  "jurisdictions": {
+    "CN": {
+      "name": "中国大陆",
+      "primary_playbook": "references/labor-cn-playbook.md",
+      "law_framework": "《劳动合同法》及配套法规",
+      "red_flags": ["法定必备条款缺失", "超期试用", "放弃社保", "普通岗位竞业无补偿"]
+    },
+    "BR": {
+      "name": "巴西",
+      "law_framework": "CLT (Consolidação das Leis do Trabalho)",
+      "red_flags": ["排除 CLT 强制权利", "PJ 掩盖劳动关系", "无 FGTS/13º", "单方无补偿解雇"],
+      "key_checks": ["书面葡语", "FGTS 8%", "解雇 severance", "LGPD 数据"]
+    },
+    "EU": {
+      "name": "欧洲（欧盟成员国）",
+      "law_framework": "欧盟指令 + 成员国国内法",
+      "red_flags": ["at-will 解雇", "无年假", "无 GDPR 合规"],
+      "country_notes": {
+        "DE": "解雇社会正当性；Works council",
+        "FR": "CDI 默认；集体协议优先",
+        "NL": "链式固定合同 → 自动永久"
+      }
+    },
+    "MX": {
+      "name": "墨西哥",
+      "law_framework": "Ley Federal del Trabajo (LFT)",
+      "red_flags": ["排除 PTU", "零补偿解除", "虚假外包"]
+    },
+    "MY": {
+      "name": "马来西亚",
+      "law_framework": "Employment Act 1955 (2022 修订)",
+      "red_flags": ["即时解雇无程序", "外籍员工无工作准证"]
+    },
+    "IN": {
+      "name": "印度",
+      "law_framework": "联邦 + 邦法；Shops & Establishments",
+      "red_flags": ["at-will 模板", "非法连续固定期", "未缴 PF/ESI"]
+    },
+    "AE": {
+      "name": "阿联酋 / 迪拜",
+      "law_framework": "Federal Decree-Law No. 33 of 2021",
+      "red_flags": ["零通知零补偿", "放弃 EOSB gratuity", "未 MOHRE 登记"],
+      "notes": "大陆法区 vs Free Zone 规则不同；DIFC 有独立雇佣法"
+    }
+  },
+  "employment_modes": {
+    "direct_hire": "华智融境外子公司直接雇佣 → 适用当地法 + 当地律师",
+    "eor_peo": "名义雇主 → 审查 EOR 协议 + 实际用工国法律",
+    "contractor": "独立承包商 → 各国「假自雇」测试",
+    "secondment": "中国外派 → 派遣合规、社保、工作许可"
+  }
+}
