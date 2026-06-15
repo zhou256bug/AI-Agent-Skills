@@ -34,4 +34,4 @@
 
 ## 关注人
 
-见 `data/watchlist.json`（可配置 Fernando A/G、Linda、Victor 等）。
+见 `data/watchlist.json`（可用 `watchlist_cli.py` 增删）。

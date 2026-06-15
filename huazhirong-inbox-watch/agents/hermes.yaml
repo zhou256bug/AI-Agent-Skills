@@ -19,7 +19,8 @@ agent_instruction: |
   1. 首次 setup status → needsSetup 时 apply IMAP + WEIXIN_TO
   2. cron/手动扫描：terminal 跑 check_unseen.py → 按 watchlist 处理 → run_scan.py --deliver
   3. 无未读也必须回复「没有新邮件」，禁止静默
-  4. 读全文/附件仅用 mail_tool.py；禁止委派、禁止发信
+  4. 关注人增删：watchlist_cli.py list/add/remove（见 watchlist-management.md）
+  5. 读全文/附件仅用 mail_tool.py；禁止委派、禁止发信
 
 cli_template: |
   python3 {skill_dir}/scripts/run_acceptance.py

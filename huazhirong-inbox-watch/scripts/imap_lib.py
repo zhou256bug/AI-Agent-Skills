@@ -280,8 +280,9 @@ def load_system_patterns() -> list[str]:
 
 
 def load_watchlist() -> list[dict[str, Any]]:
-    data = load_json(cfg.WATCHLIST_PATH)
-    return data.get("contacts", [])
+    from watchlist_lib import list_contacts
+
+    return list_contacts()
 
 
 def is_system_sender(sender: str, sender_raw: str, patterns: list[str]) -> bool:

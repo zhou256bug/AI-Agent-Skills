@@ -1,13 +1,13 @@
 ---
 name: huazhirong-inbox-watch
-version: 0.1.0
+version: 0.1.1
 description: 通用 IMAP 收件箱值守——工作日每3小时 cron 扫描 UNSEEN 未读、关注人分级处理、归档 output/scans/、推送微信。阿里企业邮开箱默认。单 Agent 闭环，setup 引导配置。Use when 未读邮件、收件箱扫描、inbox watch、mail cron、IMAP、微信推送、openclaw、hermes、setup。
 metadata: {"openclaw":{"requires":{"bins":["python3"]},"skillKey":"huazhirong-inbox-watch","emoji":"📬"},"hermes":{"tags":["email","imap","cron","inbox","weixin"],"category":"productivity","requires_toolsets":["terminal"]}}
 user-invocable: true
 license: Apache-2.0
 ---
 
-# 收件箱值守 inbox-watch v0.1.0
+# 收件箱值守 inbox-watch v0.1.1
 
 > **单 Agent 闭环**：terminal 扫未读 → 关注人处理 → emoji 摘要 → 归档 → 微信推送  
 > **slash**：`/inbox-watch`
@@ -48,6 +48,7 @@ python3 huazhirong-inbox-watch/scripts/run_acceptance.py
 | **R** | 读全文、读 UID | `mail_tool.py read --uid` |
 | **A** | 下载附件 | `mail_tool.py attachments_match` |
 | **S** | 配置邮箱、setup | `inbox_watch_cli.py setup` |
+| **W** | 关注人增删、「加入/移除关注」 | `watchlist_cli.py list/add/remove`（见 `references/watchlist-management.md`） |
 
 ---
 
@@ -85,7 +86,7 @@ python3 scripts/mail_tool.py read --uid 12345
 | `INBOX_WATCH_ARCHIVE_DIR` | `<skill>/output` | 归档根目录 |
 | `WEIXIN_TO` | — | 微信推送对象 |
 
-关注人：`data/watchlist.json`（可编辑）  
+关注人：`data/watchlist.json`（默认 8 人）；**用户口述增删** → `watchlist_cli.py`（见 `references/watchlist-management.md`）  
 系统发件人过滤：`data/system-sender-patterns.json`
 
 ---

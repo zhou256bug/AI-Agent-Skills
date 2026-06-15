@@ -44,7 +44,9 @@ def main() -> int:
         "scripts/check_unseen.py", "scripts/mail_tool.py",
         "scripts/run_scan.py", "scripts/inbox_watch_cli.py",
         "scripts/inbox_watch_config.py", "scripts/imap_lib.py",
-        "scripts/deliver_weixin.py", "evaluation/run_evals.py",
+        "references/watchlist-management.md",
+        "scripts/watchlist_cli.py", "scripts/deliver_weixin.py",
+        "evaluation/run_evals.py",
         "agents/hermes.yaml", "bundles/inbox-watch.hermes.yaml",
     ]
     for rel in required:
@@ -55,7 +57,7 @@ def main() -> int:
         hit = any(word in ln for ln in skill_md.splitlines() if "禁止" not in ln)
         record(f"CL-{word[:6]}", f"SKILL 不含 {word}", not hit)
 
-    record("VER01", "version 0.1.0", "version: 0.1.0" in skill_md)
+    record("VER01", "version 0.1.1", "version: 0.1.1" in skill_md)
     record("RTE01", "路由含 cron C", "cron" in skill_md.lower() and "check_unseen" in skill_md)
     record("RTE02", "slash inbox-watch", "/inbox-watch" in skill_md or "inbox-watch" in skill_md)
     record("RULE01", "无邮件不可静默", "没有新邮件" in skill_md)
@@ -70,7 +72,7 @@ def main() -> int:
     patterns = imap.load_system_patterns()
     record("DAT01", "系统过滤模式>=20", len(patterns) >= 20)
     contacts = imap.load_watchlist()
-    record("DAT02", "关注人>=4", len(contacts) >= 4)
+    record("DAT02", "关注人>=8", len(contacts) >= 8)
 
     record("DAT03", "Fernando Alonso 在 watchlist", any("alonso" in str(c).lower() for c in contacts))
 
@@ -152,6 +154,47 @@ def main() -> int:
             cwd=str(SKILL),
         )
         record("SET01", "setup apply 写文件", env.is_file() and apply.returncode == 0)
+
+    record("DAT04", "charlene 在列表", any("charlene.cheng" in str(c).lower() for c in contacts))
+
+    wl_list = subprocess.run(
+        [sys.executable, str(SCRIPTS / "watchlist_cli.py"), "list"],
+        capture_output=True,
+        text=True,
+        cwd=str(SKILL),
+    )
+    record("WL01", "watchlist list", wl_list.returncode == 0 and "charlene" in wl_list.stdout.lower())
+
+    with tempfile.TemporaryDirectory() as td:
+        tmp_wl = Path(td) / "watchlist.json"
+        import shutil
+
+        shutil.copy(SKILL / "data" / "watchlist.json", tmp_wl)
+        env = {**os.environ, "INBOX_WATCH_WATCHLIST_FILE": str(tmp_wl)}
+        add = subprocess.run(
+            [
+                sys.executable,
+                str(SCRIPTS / "watchlist_cli.py"),
+                "add",
+                "--name",
+                "测试人",
+                "--email",
+                "test-add@example.com",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=str(SKILL),
+            env=env,
+        )
+        record("WL02", "watchlist add", add.returncode == 0)
+        rm = subprocess.run(
+            [sys.executable, str(SCRIPTS / "watchlist_cli.py"), "remove", "test-add@example.com"],
+            capture_output=True,
+            text=True,
+            cwd=str(SKILL),
+            env=env,
+        )
+        record("WL03", "watchlist remove", rm.returncode == 0)
 
     evl = subprocess.run(
         [sys.executable, str(SKILL / "evaluation" / "run_evals.py")],

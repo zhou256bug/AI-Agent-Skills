@@ -6,6 +6,18 @@
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-06-15
+
+### Added
+
+- 关注人：程晓艳、林旭伟、蔡伟旭(Eric)、万丽霞
+- `watchlist_cli.py`（list/add/remove）+ `references/watchlist-management.md`
+- 环境变量 `INBOX_WATCH_WATCHLIST_FILE` 可指向自定义列表路径
+
+### Changed
+
+- 版本升至 **0.1.1**；SKILL 路由新增 **W** 关注人管理模式
+
 ## [0.1.0] - 2026-06-15
 
 ### Added
