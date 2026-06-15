@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "收件箱值守 — cron UNSEEN 扫描、关注人、归档、微信推送",
   "evals": [
     {
@@ -65,6 +65,14 @@
       "expected": "必须回复没有新邮件",
       "must_have": ["没有新邮件", "静默"],
       "loads_module": "references/emoji-output-guide.md"
+    },
+    {
+      "name": "P-扫描手机PDF",
+      "input": "扫描完做成手机 PDF 推微信",
+      "expected_mode": "P",
+      "expected": "render_scan_pdf.py mobile-default",
+      "must_have": ["render_scan_pdf", "PDF", "mobile"],
+      "loads_module": "references/pdf-scan-workflow.md"
     },
     {
       "name": "W-关注人增删",

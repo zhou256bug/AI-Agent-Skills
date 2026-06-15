@@ -15,6 +15,7 @@ sys.path.insert(0, str(SCRIPT_DIR))
 import inbox_watch_config as cfg  # noqa: E402
 from deliver_weixin import post_send  # noqa: E402
 from imap_lib import ImapConfigError, ImapConnectionError, bootstrap_env, scan_unseen  # noqa: E402
+from render_scan_pdf import render_pdf  # noqa: E402
 
 
 def build_summary_markdown(result: dict) -> str:
@@ -103,6 +104,7 @@ def main() -> int:
     ap.add_argument("--deliver", action="store_true", help="推送微信（需 WEIXIN_TO）")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--no-archive", action="store_true")
+    ap.add_argument("--no-pdf", action="store_true", help="跳过手机 PDF（默认 deliver 时生成）")
     args = ap.parse_args()
 
     bootstrap_env(explicit_env_file=args.env_file)
@@ -114,17 +116,28 @@ def main() -> int:
 
     md = build_summary_markdown(result)
     archive_path: Path | None = None
+    pdf_path: Path | None = None
+    pdf_error: str | None = None
     if not args.no_archive:
         out_dir = cfg.scan_archive_dir()
         out_dir.mkdir(parents=True, exist_ok=True)
         stamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
         archive_path = out_dir / f"{stamp}_inbox_scan.md"
         archive_path.write_text(md, encoding="utf-8")
+        want_pdf = archive_path is not None and not args.no_pdf
+        if want_pdf and archive_path:
+            title = f"收件箱扫描 · {stamp.replace('_', ' ')}"
+            pdf_path, code, detail = render_pdf(body_md=archive_path, title=title)
+            if code != 0:
+                pdf_error = detail
+                pdf_path = None
 
     payload = {
         "total_unseen": result["total_unseen"],
         "personal_unseen": result["personal_unseen"],
         "archive_path": str(archive_path) if archive_path else None,
+        "pdf_path": str(pdf_path) if pdf_path else None,
+        "pdf_error": pdf_error,
         "empty": result["total_unseen"] == 0,
     }
     print(json.dumps(payload, ensure_ascii=False, indent=2))
@@ -132,7 +145,8 @@ def main() -> int:
     print(md, end="")
 
     if args.deliver:
-        wx = post_send(build_weixin_text(result), media_path=archive_path, dry_run=args.dry_run)
+        media = pdf_path if pdf_path and pdf_path.is_file() else archive_path
+        wx = post_send(build_weixin_text(result), media_path=media, dry_run=args.dry_run)
         print("---DELIVER---")
         print(json.dumps(wx, ensure_ascii=False, indent=2))
         if not wx.get("ok"):

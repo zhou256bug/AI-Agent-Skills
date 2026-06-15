@@ -26,7 +26,7 @@ hermes cron create "0 7-22/3 * * 1-5" \
 2. 解析 `TOTAL_UNSEEN` / `PERSONAL_UNSEEN` / `---EMAIL---` 块
 3. 无未读 → 回复 **「没有新邮件」** 并 `run_scan.py --deliver`（不可静默）
 4. 有关注人 → 按 `WATCH_ACTION` 读全文或下载附件
-5. `run_scan.py --deliver` 归档 Markdown + 推送微信
+5. `run_scan.py --deliver` 归档 Markdown + **手机 PDF** + 推送微信
 6. 向用户输出 emoji 摘要
 
 ## 手动测试

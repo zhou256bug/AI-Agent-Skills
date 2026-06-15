@@ -10,7 +10,7 @@
 
 ### Added
 
-- 规范化技能 `huazhirong-inbox-watch`（slash `/inbox-watch`）：通用 IMAP UNSEEN 扫描、cron 值守、关注人、归档、微信推送
+- 规范化技能 `huazhirong-inbox-watch`（slash `/inbox-watch`）：通用 IMAP UNSEEN 扫描、cron 值守、关注人、归档、微信推送、**手机竖版 PDF**
 - `huazhirong-legal-affairs/samples/` 手机 PDF 验收样例（供本机 `git pull` 预览）
 - **技能设计宪法** `docs/SKILL-DESIGN-STANDARDS.md`（七大原则 + 脚手架 + Checklist）
 - `docs/skill-template/` 新技能上线 Checklist 与指引

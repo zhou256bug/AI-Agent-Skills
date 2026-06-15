@@ -1,13 +1,13 @@
 ---
 name: huazhirong-inbox-watch
-version: 0.1.1
+version: 0.1.2
 description: 通用 IMAP 收件箱值守——工作日每3小时 cron 扫描 UNSEEN 未读、关注人分级处理、归档 output/scans/、推送微信。阿里企业邮开箱默认。单 Agent 闭环，setup 引导配置。Use when 未读邮件、收件箱扫描、inbox watch、mail cron、IMAP、微信推送、openclaw、hermes、setup。
 metadata: {"openclaw":{"requires":{"bins":["python3"]},"skillKey":"huazhirong-inbox-watch","emoji":"📬"},"hermes":{"tags":["email","imap","cron","inbox","weixin"],"category":"productivity","requires_toolsets":["terminal"]}}
 user-invocable: true
 license: Apache-2.0
 ---
 
-# 收件箱值守 inbox-watch v0.1.1
+# 收件箱值守 inbox-watch v0.1.2
 
 > **单 Agent 闭环**：terminal 扫未读 → 关注人处理 → emoji 摘要 → 归档 → 微信推送  
 > **slash**：`/inbox-watch`
@@ -24,6 +24,7 @@ python3 huazhirong-inbox-watch/scripts/run_acceptance.py
 - 注册：`references/openclaw-hermes-registration.md`
 - 引导：`references/onboarding-flow.md`
 - Cron：`references/cron-setup.md` + `references/agent-cron-prompt.md`
+- 手机 PDF：`references/pdf-scan-workflow.md`
 - bundle：`bundles/inbox-watch.hermes.yaml`
 
 ---
@@ -36,6 +37,7 @@ python3 huazhirong-inbox-watch/scripts/run_acceptance.py
 4. **IMAP 搜索** — 仅用 `UNSEEN`/`ALL`/`SINCE`；过滤在 Python 侧（见 `references/imap-traps.md`）
 5. **terminal 执行脚本** — 禁止在 execute_code 沙箱跑 imaplib
 6. **Emoji 输出** — `references/emoji-output-guide.md`
+7. **手机 PDF** — cron `--deliver` 必须走 `render_scan_pdf.py` → vendored `render_mobile_pdf.py`（`mobile-default` 284pt）；禁止手写 HTML。见 `references/pdf-scan-workflow.md`；缺依赖时降级 Markdown，扫描不中断
 
 ---
 
@@ -58,7 +60,9 @@ python3 huazhirong-inbox-watch/scripts/run_acceptance.py
 |------|------|
 | `check_unseen.py` | UNSEEN 扫描，输出 `TOTAL_UNSEEN` / `---EMAIL---` |
 | `mail_tool.py` | `list` / `read` / `read_match` / `attachments_match` / `unseen` |
-| `run_scan.py` | 生成 emoji Markdown → `output/scans/` → 可选 `--deliver` |
+| `run_scan.py` | 生成 emoji Markdown → PDF → `output/scans/` → 可选 `--deliver` |
+| `render_scan_pdf.py` | 扫描摘要手机竖版 PDF（便捷入口） |
+| `render_mobile_pdf.py` | 底层渲染引擎（vendored，勿改逻辑） |
 | `inbox_watch_cli.py` | `setup` / `doctor` / `scan` |
 | `deliver_weixin.py` | 微信 bridge 推送 |
 
@@ -66,7 +70,7 @@ python3 huazhirong-inbox-watch/scripts/run_acceptance.py
 # 扫描（Agent cron 第一步）
 python3 scripts/check_unseen.py
 
-# 归档 + 推送
+# 归档 + 推送（含手机 PDF）
 python3 scripts/run_scan.py --deliver
 
 # 读关注人全文

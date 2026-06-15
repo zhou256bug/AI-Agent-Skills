@@ -19,6 +19,12 @@ PASS = FAIL = SKIP = 0
 RESULTS: list[dict] = []
 
 
+def skip(cid: str, name: str, detail: str = "") -> None:
+    global SKIP
+    SKIP += 1
+    RESULTS.append({"id": cid, "ok": None, "name": name, "detail": detail[:120]})
+
+
 def record(cid: str, name: str, ok: bool, detail: str = "") -> None:
     global PASS, FAIL
     PASS += int(ok)
@@ -40,10 +46,11 @@ def main() -> int:
         "data/watchlist.json", "data/system-sender-patterns.json",
         "references/cron-setup.md", "references/agent-cron-prompt.md",
         "references/imap-traps.md", "references/emoji-output-guide.md",
-        "references/onboarding-flow.md",
+        "references/onboarding-flow.md", "references/pdf-scan-workflow.md",
         "scripts/check_unseen.py", "scripts/mail_tool.py",
         "scripts/run_scan.py", "scripts/inbox_watch_cli.py",
         "scripts/inbox_watch_config.py", "scripts/imap_lib.py",
+        "scripts/render_mobile_pdf.py", "scripts/render_scan_pdf.py",
         "references/watchlist-management.md",
         "scripts/watchlist_cli.py", "scripts/deliver_weixin.py",
         "evaluation/run_evals.py",
@@ -57,7 +64,8 @@ def main() -> int:
         hit = any(word in ln for ln in skill_md.splitlines() if "禁止" not in ln)
         record(f"CL-{word[:6]}", f"SKILL 不含 {word}", not hit)
 
-    record("VER01", "version 0.1.1", "version: 0.1.1" in skill_md)
+    record("VER01", "version 0.1.2", "version: 0.1.2" in skill_md)
+    record("PDF00", "SKILL 手机 PDF 铁律", "render_mobile_pdf" in skill_md and "pdf-scan-workflow" in skill_md)
     record("RTE01", "路由含 cron C", "cron" in skill_md.lower() and "check_unseen" in skill_md)
     record("RTE02", "slash inbox-watch", "/inbox-watch" in skill_md or "inbox-watch" in skill_md)
     record("RULE01", "无邮件不可静默", "没有新邮件" in skill_md)
@@ -196,6 +204,48 @@ def main() -> int:
         )
         record("WL03", "watchlist remove", rm.returncode == 0)
 
+    render_py = SCRIPTS / "render_mobile_pdf.py"
+    render_scan = SCRIPTS / "render_scan_pdf.py"
+    record("PDF01", "render_mobile_pdf 存在", render_py.is_file())
+    record("PDF02", "render_scan_pdf 存在", render_scan.is_file())
+    try:
+        import importlib.util as _iu
+
+        _wu = _iu.find_spec("weasyprint")
+        have_weasy = _wu is not None
+    except Exception:
+        have_weasy = False
+    try:
+        import fitz  # noqa: F401
+
+        have_fitz = True
+    except ImportError:
+        have_fitz = False
+    if have_weasy and have_fitz and render_scan.is_file():
+        with tempfile.TemporaryDirectory() as td:
+            sample = Path(td) / "scan.md"
+            sample.write_text(
+                "## 📌 结论\n\n没有新邮件。\n\n## 👉 下一步\n\n继续扫描。\n",
+                encoding="utf-8",
+            )
+            r = subprocess.run(
+                [sys.executable, str(render_scan), "--body-md", str(sample)],
+                capture_output=True,
+                text=True,
+                timeout=120,
+            )
+            record("PDF03", "render_scan_pdf 退出码 0", r.returncode == 0, r.stderr[:120])
+            pdf_out = sample.with_suffix(".pdf")
+            if r.returncode == 0 and pdf_out.is_file():
+                doc = fitz.open(str(pdf_out))
+                w_mm = doc[0].rect.width * 25.4 / 72
+                record("PDF04", "PDF 宽约 100mm", 96 <= w_mm <= 104, f"{w_mm:.1f}mm")
+            else:
+                record("PDF04", "PDF 输出存在", False)
+    else:
+        skip("PDF03", "render_scan_pdf 渲染", f"weasyprint={have_weasy} PyMuPDF={have_fitz}")
+        skip("PDF04", "PDF 宽度校验", "render 依赖缺失")
+
     evl = subprocess.run(
         [sys.executable, str(SKILL / "evaluation" / "run_evals.py")],
         capture_output=True,
@@ -216,7 +266,7 @@ def main() -> int:
     print(f"\n{'ID':<12} {'OK':<5} 用例")
     print("-" * 60)
     for r in RESULTS:
-        mark = "✅" if r["ok"] else "❌"
+        mark = "✅" if r["ok"] else ("⏭" if r["ok"] is None else "❌")
         print(f"{r['id']:<12} {mark:<5} {r['name']}")
     print("-" * 60)
     print(f"PASS={PASS}  FAIL={FAIL}  SKIP={SKIP}")

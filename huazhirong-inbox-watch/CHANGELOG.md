@@ -6,6 +6,18 @@
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-06-15
+
+### Added
+
+- vendored `scripts/render_mobile_pdf.py` + `scripts/render_scan_pdf.py`
+- `references/pdf-scan-workflow.md`（手机竖版 284pt，`mobile-default`）
+- `run_scan.py` 归档后自动渲 PDF；`--deliver` 微信优先推送 PDF
+
+### Changed
+
+- 版本升至 **0.1.2**；SKILL 铁律补手机 PDF（C 类编排合规）
+
 ## [0.1.1] - 2026-06-15
 
 ### Added

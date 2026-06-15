@@ -22,6 +22,7 @@
    ```bash
    python3 huazhirong-inbox-watch/scripts/run_scan.py --deliver
    ```
+   （内部：归档 `.md` → `render_scan_pdf.py` 手机竖版 PDF → 微信 `media_path` 优先 PDF；见 `references/pdf-scan-workflow.md`）
 4. 回复用户完整摘要；关注人邮件突出 ⭐
 
 ## 铁律
@@ -30,7 +31,7 @@
 - ❌ 禁止发送邮件（只读 IMAP）
 - ❌ 禁止委派 weekly-report / 其他 skill
 - ✅ 无未读仍推送「没有新邮件」
-- ✅ 归档在 `output/scans/`
+- ✅ 归档在 `output/scans/`（`.md` + 手机竖版 `.pdf`）
 
 ## 关注人
 

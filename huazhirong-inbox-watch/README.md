@@ -2,7 +2,7 @@
 
 通用 IMAP 收件箱 cron 扫描 — 工作日每 3 小时查 UNSEEN、关注人分级、归档、推送微信。
 
-**版本**：0.1.0 | **slash**：`/inbox-watch`
+**版本**：0.1.2 | **slash**：`/inbox-watch`
 
 ## 能力
 
@@ -11,7 +11,7 @@
 - 系统邮件过滤 + 关注人标注
 - `mail_tool.py` 读信/匹配/附件
 - 无未读仍汇报「没有新邮件」
-- 归档 `output/scans/` + 微信 bridge 推送
+- 归档 `output/scans/`（Markdown + **手机竖版 PDF**）+ 微信 bridge 推送
 
 ## 快速开始
 
