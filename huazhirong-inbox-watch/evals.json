@@ -1,0 +1,70 @@
+{
+  "version": "0.1.0",
+  "description": "收件箱值守 — cron UNSEEN 扫描、关注人、归档、微信推送",
+  "evals": [
+    {
+      "name": "C-cron扫描",
+      "input": "cron 到了，扫描未读邮件并推送微信",
+      "expected_mode": "C",
+      "expected": "check_unseen → run_scan --deliver；无未读仍汇报",
+      "must_have": ["check_unseen", "没有新邮件", "deliver"],
+      "loads_module": "references/agent-cron-prompt.md"
+    },
+    {
+      "name": "C-工作日调度",
+      "input": "设置每3小时收件箱 cron",
+      "expected_mode": "C",
+      "expected": "0 7-22/3 * * 1-5",
+      "must_have": ["7-22/3", "cron"],
+      "loads_module": "references/cron-setup.md"
+    },
+    {
+      "name": "M-手动扫描",
+      "input": "/inbox-watch 看看有什么未读",
+      "expected_mode": "M",
+      "expected": "check_unseen.py",
+      "must_have": ["UNSEEN", "check_unseen"],
+      "loads_module": "scripts/check_unseen.py"
+    },
+    {
+      "name": "R-读全文",
+      "input": "Fernando Alonso 那封邮件读全文",
+      "expected_mode": "R",
+      "expected": "mail_tool.py read --uid",
+      "must_have": ["read", "uid"],
+      "loads_module": "scripts/mail_tool.py"
+    },
+    {
+      "name": "A-下载附件",
+      "input": "Linda 尼尔森报告下载附件",
+      "expected_mode": "A",
+      "expected": "attachments_match",
+      "must_have": ["attachments_match", "Linda"],
+      "loads_module": "data/watchlist.json"
+    },
+    {
+      "name": "S-setup",
+      "input": "配置收件箱 IMAP 和微信推送",
+      "expected_mode": "S",
+      "expected": "setup status/apply",
+      "must_have": ["setup", "IMAP", "WEIXIN"],
+      "loads_module": "references/onboarding-flow.md"
+    },
+    {
+      "name": "IMAP陷阱",
+      "input": "为什么不能用中文 SEARCH",
+      "expected_mode": "M",
+      "expected": "仅 UNSEEN；Python 侧过滤",
+      "must_have": ["UNSEEN", "Python"],
+      "loads_module": "references/imap-traps.md"
+    },
+    {
+      "name": "无邮件铁律",
+      "input": "今天没有未读邮件 cron 要不要静默",
+      "expected_mode": "C",
+      "expected": "必须回复没有新邮件",
+      "must_have": ["没有新邮件", "静默"],
+      "loads_module": "references/emoji-output-guide.md"
+    }
+  ]
+}

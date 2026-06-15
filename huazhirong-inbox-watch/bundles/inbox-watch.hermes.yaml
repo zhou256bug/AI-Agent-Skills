@@ -1,0 +1,8 @@
+name: inbox-watch
+description: 收件箱未读扫描、cron 值守、微信推送
+skills:
+  - huazhirong-inbox-watch
+instruction: |
+  使用 huazhirong-inbox-watch 处理收件箱扫描与 cron 值守。
+  扫描用 check_unseen.py；汇总归档并推送用 run_scan.py --deliver。
+  无未读也必须告知「没有新邮件」。禁止委派其他 skill。

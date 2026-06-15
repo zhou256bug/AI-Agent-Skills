@@ -14,6 +14,7 @@
 | [`cross-cultural-consultant`](cross-cultural-consultant/) | 跨文化管理顾问:出国前画像 / 出国中场景问答 / 回国后复盘 / 来访接待,基于 Hofstede 六维(119 国)+ 港大 EMBA6611 框架 | 无 | PDF 输出需 weasyprint/ghostscript/PyMuPDF | ✅ 可用 |
 | [`huazhirong-management-weekly-report`](huazhirong-management-weekly-report/) | 管理团队周报汇编(独立完整):内置取信→汇编四段→长条 PDF→多通道投递,一条命令编排且失败可断点续跑 | 需(收件箱 IMAP,本地配置) | PDF 需 weasyprint/ghostscript/PyMuPDF;企业微信/飞书投递需 webhook | ✅ 可用 |
 | [`huazhirong-legal-affairs`](huazhirong-legal-affairs/) | 华智融法务合同审核:海外经销/采购/境内用工/解约/POS合规/股权;emoji+手机PDF;单 Agent 闭环 | 无 | PDF 需 weasyprint/ghostscript/PyMuPDF | ✅ 可用 |
+| [`huazhirong-inbox-watch`](huazhirong-inbox-watch/) | 收件箱值守:通用 IMAP cron 扫 UNSEEN、关注人分级、归档、微信推送;slash `/inbox-watch` | 需(IMAP + WEIXIN_TO) | 无(纯标准库) | ✅ 可用 |
 | `migration/huazhirong-business-support` | 华智融商务支持总入口原始迁移素材 | — | — | 🚧 待规范化(强耦合,后续讨论) |
 
 > `migration/` 保留尚未规范化的原始技能素材,**不建议直接注册使用**;规范化后的技能会提升到仓库根目录。
@@ -35,6 +36,7 @@ AI-Agent-Skills/
 ├── aliyun-enterprise-mail/   # 技能:阿里企业邮箱读信
 ├── cross-cultural-consultant/# 技能:跨文化管理顾问
 ├── huazhirong-legal-affairs/ # 技能:华智融法务
+├── huazhirong-inbox-watch/   # 技能:收件箱 cron 值守
 ├── huazhirong-management-weekly-report/
 └── migration/                # 原始迁移素材(待规范化)
 ```
@@ -120,7 +122,7 @@ python3 scripts/validate_skill_scaffold.py
 python3 <skill>/scripts/run_acceptance.py   # 或 evaluation/run_evals.py
 ```
 
-**参考技能**：`cross-cultural-consultant` · `aliyun-enterprise-mail` · `huazhirong-management-weekly-report` · `huazhirong-legal-affairs`
+**参考技能**：`cross-cultural-consultant` · `aliyun-enterprise-mail` · `huazhirong-management-weekly-report` · `huazhirong-legal-affairs` · `huazhirong-inbox-watch`
 
 ---
 

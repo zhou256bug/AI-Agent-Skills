@@ -1,0 +1,31 @@
+# Hermes Agent 注册片段
+
+display_name: "收件箱值守"
+skill_name: huazhirong-inbox-watch
+slash_command: /inbox-watch
+
+hermes_config_yaml: |
+  skills:
+    external_dirs:
+      - ~/Projects/AI-Agent-Skills
+
+hermes_cli: |
+  hermes chat --toolsets terminal,skills -q "/inbox-watch 扫描未读邮件并推送微信"
+
+bundle_file: bundles/inbox-watch.hermes.yaml
+
+agent_instruction: |
+  加载 huazhirong-inbox-watch 后：
+  1. 首次 setup status → needsSetup 时 apply IMAP + WEIXIN_TO
+  2. cron/手动扫描：terminal 跑 check_unseen.py → 按 watchlist 处理 → run_scan.py --deliver
+  3. 无未读也必须回复「没有新邮件」，禁止静默
+  4. 读全文/附件仅用 mail_tool.py；禁止委派、禁止发信
+
+cli_template: |
+  python3 {skill_dir}/scripts/run_acceptance.py
+  python3 {skill_dir}/scripts/inbox_watch_cli.py setup status
+  python3 {skill_dir}/scripts/check_unseen.py
+
+install_local: |
+  ln -sf ~/Projects/AI-Agent-Skills/huazhirong-inbox-watch \
+    ~/.hermes/skills/huazhirong-inbox-watch
