@@ -1,0 +1,22 @@
+# OpenClaw 注册片段
+
+display_name: "收件箱值守"
+skill_name: huazhirong-inbox-watch
+skill_key: huazhirong-inbox-watch
+
+openclaw_json_snippet: |
+  {
+    "skills": {
+      "load": {
+        "extraDirs": ["~/Projects/AI-Agent-Skills"],
+        "watch": true
+      },
+      "entries": {
+        "huazhirong-inbox-watch": { "enabled": true }
+      }
+    }
+  }
+
+agent_instruction: |
+  加载 huazhirong-inbox-watch：setup → check_unseen → 关注人处理 → 归档 → 可选微信推送。
+  无未读仍汇报。单 Agent 闭环。

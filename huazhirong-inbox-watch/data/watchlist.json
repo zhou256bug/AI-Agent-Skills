@@ -1,0 +1,78 @@
+{
+  "version": "1.1.0",
+  "description": "关注发件人及处理策略。Agent 可用 watchlist_cli 增删；用户口述时由 Agent 执行 CLI。",
+  "contacts": [
+    {
+      "id": "fernando-alonso",
+      "name": "Fernando Alonso",
+      "email_patterns": ["fernando.alonso@newpos.mx"],
+      "role": "墨西哥公司 GM",
+      "action": "read_full",
+      "priority": "high",
+      "note": "必读全文"
+    },
+    {
+      "id": "fernando-geraldeli",
+      "name": "Fernando Geraldeli",
+      "email_patterns": ["fernando.geraldeli", "geraldeli"],
+      "role": "巴西公司 GM",
+      "action": "read_full",
+      "priority": "high",
+      "note": "必读全文"
+    },
+    {
+      "id": "linda-nielsen",
+      "name": "Linda",
+      "email_patterns": ["linda@newpostech.com"],
+      "role": "尼尔森报告",
+      "action": "read_attachments",
+      "priority": "high",
+      "note": "读全文并下载附件分析"
+    },
+    {
+      "id": "victor",
+      "name": "Victor",
+      "email_patterns": ["victor"],
+      "role": "关注联系人",
+      "action": "report_promptly",
+      "priority": "medium",
+      "note": "及时汇报"
+    },
+    {
+      "id": "charlene-cheng",
+      "name": "程晓艳 (Charlene)",
+      "email_patterns": ["charlene.cheng@newpostech.com"],
+      "role": "内部同事",
+      "action": "report_promptly",
+      "priority": "medium",
+      "note": "用户指定关注"
+    },
+    {
+      "id": "jay-lin",
+      "name": "林旭伟 (Jay)",
+      "email_patterns": ["jay.lin@newpostech.com"],
+      "role": "内部同事",
+      "action": "report_promptly",
+      "priority": "medium",
+      "note": "用户指定关注"
+    },
+    {
+      "id": "eric-cai",
+      "name": "蔡伟旭 (Eric)",
+      "email_patterns": ["eric.cai@newpostech.com"],
+      "role": "内部同事",
+      "action": "report_promptly",
+      "priority": "high",
+      "note": "用户指定关注（邮箱 eric.cai@newpostech.com）"
+    },
+    {
+      "id": "lucy-wan",
+      "name": "万丽霞 (Lucy)",
+      "email_patterns": ["lucy.wan@newpostech.com"],
+      "role": "内部同事",
+      "action": "report_promptly",
+      "priority": "medium",
+      "note": "用户指定关注"
+    }
+  ]
+}
