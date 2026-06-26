@@ -95,26 +95,27 @@ skills:
 > **新技能 Checklist**：[docs/skill-template/CHECKLIST.md](docs/skill-template/CHECKLIST.md)  
 > **Agent 自动遵守**：`.cursor/rules/skill-design-standards.mdc`
 
-### 七大原则（摘要）
+### 八大原则（摘要）
 
 | 原则 | 要点 |
 |------|------|
-| **通用化** | 无平台专有路径、无委派链、无 `newpos/` |
-| **独立跑通** | 单 skill 可注册自检；`run_acceptance.py` 或 `run_evals.py` |
+| **原子技能** | **默认一件事一个 skill**；组合用 bundle/cron prompt，禁止 monolith |
+| **通用化** | 无平台专有路径、无 delegate_task、无 `newpos/` |
+| **独立跑通** | 单 skill 可注册自检；只验收本 skill 能力 |
 | **开箱即用** | 默认值可跑；知识/data 自包含 |
 | **参数化** | `scripts/*_config.py` + 环境变量 |
 | **引导配置化** | 有凭据时 `setup status` / `setup apply` |
-| **Emoji 化** | 报告输出类：`emoji-output-guide.md`，`📌🔴🟡🟢👉` |
-| **手机体验化** | 长报告类：`render_mobile_pdf.py` + PDF 工作流 |
+| **Emoji 化** | 报告输出类（B 原子工具可豁免） |
+| **手机体验化** | 长报告 PDF（B 类可豁免；优先共享 render） |
 
 ### 基础约定
 
-1. **入口 `SKILL.md`**：frontmatter 含 `name`、`description`（*Use when* 触发词）、`metadata.{openclaw,hermes}`；正文只做路由。
-2. **自包含**：不依赖 `$HERMES_HOME/...` 或本机绝对路径。
-3. **单 Agent 闭环**：禁止 `delegate_task` 与跨 skill 委派。
-4. **平台脚手架**：`agents/{openclaw,hermes,openai}.yaml` + `openclaw-hermes-registration.md`。
-5. **变更记录**：技能级 + 根级 `CHANGELOG.md`（Keep a Changelog + SemVer）。
-6. **可选依赖显式声明**：PDF 等缺失时核心流程仍可用。
+1. **原子 skill 优先**：新建 skill 先读 [`docs/skill-template/ATOMIC-SKILL-GUIDE.md`](docs/skill-template/ATOMIC-SKILL-GUIDE.md)。
+2. **入口 `SKILL.md`**：frontmatter + **窄路由**；禁止一个 slash 包办多职责。
+3. **自包含**：不依赖 `$HERMES_HOME/...` 或本机绝对路径。
+4. **单 Agent 组合**：禁止 skill 内自动加载其他 skill；允许同一会话显式组合多个原子 skill。
+5. **平台脚手架**：`agents/` + `openclaw-hermes-registration.md`。
+6. **变更记录**：技能级 + 根级 `CHANGELOG.md`（Keep a Changelog + SemVer）。
 7. **合并前校验**：
 
 ```bash
@@ -122,7 +123,7 @@ python3 scripts/validate_skill_scaffold.py
 python3 <skill>/scripts/run_acceptance.py   # 或 evaluation/run_evals.py
 ```
 
-**参考技能**：`cross-cultural-consultant` · `aliyun-enterprise-mail` · `huazhirong-management-weekly-report` · `huazhirong-legal-affairs` · `huazhirong-inbox-watch`
+**参考技能**：`aliyun-enterprise-mail`（B 原子）· `cross-cultural-consultant` / `huazhirong-legal-affairs`（A 领域）· `huazhirong-management-weekly-report`（E 编排例外，新建勿模仿）
 
 ---
 

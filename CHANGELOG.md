@@ -8,8 +8,16 @@
 
 ## [Unreleased]
 
+### Changed
+
+- **技能设计宪法 v1.1.0**：**原子技能优先**（八大原则）；组合分层（bundle / cron prompt）；E 类编排例外；反 monolith 反模式
+- 更新 `docs/skill-template/CHECKLIST.md`、`.cursor/rules/skill-design-standards.mdc`
+- 根 `README.md` 技能开发规范同步为八大原则
+
 ### Added
 
+- `docs/skill-template/ATOMIC-SKILL-GUIDE.md`
+- `docs/cron-prompts/README.md`（cron prompt 平台层目录）
 - 规范化技能 `huazhirong-inbox-watch`（slash `/inbox-watch`）：通用 IMAP UNSEEN 扫描、cron 值守、关注人、归档、微信推送、**手机竖版 PDF**
 - `huazhirong-legal-affairs/samples/` 手机 PDF 验收样例（供本机 `git pull` 预览）
 - **技能设计宪法** `docs/SKILL-DESIGN-STANDARDS.md`（七大原则 + 脚手架 + Checklist）

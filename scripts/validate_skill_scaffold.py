@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """仓库级技能脚手架校验（纯标准库）。
 
-扫描仓库根目录下所有含 SKILL.md 的技能（排除 migration/），
-对照 docs/SKILL-DESIGN-STANDARDS.md 检查最低硬性文件。
+对照 docs/SKILL-DESIGN-STANDARDS.md v1.1.0（原子技能优先 + 八大原则）。
 
 用法：
     python3 scripts/validate_skill_scaffold.py
