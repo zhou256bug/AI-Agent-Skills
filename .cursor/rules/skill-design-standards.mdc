@@ -6,37 +6,45 @@ alwaysApply: true
 
 # 技能设计硬性规则
 
-开发 `AI-Agent-Skills` 仓库内**任何新技能**或**规范化 migration 技能**时，必须先阅读并遵守：
+开发本仓库**任何新技能**或**规范化 migration 技能**时，必须先阅读并遵守：
 
-**全文**：`docs/SKILL-DESIGN-STANDARDS.md`  
-**模板**：`docs/skill-template/CHECKLIST.md`
+**宪法全文**：`docs/SKILL-DESIGN-STANDARDS.md`  
+**原子技能指引**：`docs/skill-template/ATOMIC-SKILL-GUIDE.md`  
+**Checklist**：`docs/skill-template/CHECKLIST.md`
 
-## 七大原则（不可省略）
+## 零、原子技能优先（最高优先级）
 
-1. **通用化** — 无 `$HERMES_HOME`、`newpos/`、人名委派链；平台无关
-2. **独立跑通** — 单 skill 目录可注册自检；`run_acceptance.py` 或 `run_evals.py`
-3. **开箱即用** — 默认值可跑；知识/data 自包含；`SKILL.md` §零写注册路径
-4. **参数化** — `scripts/*_config.py` + 环境变量；业务常量不散落
-5. **引导配置化** — 有凭据/个性化 → `setup status` / `setup apply` / `onboarding-flow.md`
-6. **Emoji 化** — 报告输出类 → `emoji-output-guide.md`；`📌🔴🟡🟢👉⚗️`
-7. **手机体验化** — 长报告类 → `render_mobile_pdf.py` + `pdf-*-workflow.md`；禁手写 HTML
+- **默认**：一个 skill = **一件事**（B 原子工具 / A 领域知识）
+- **禁止**新建 monolith skill（读信+摘要+PDF+推送+cron 一包）
+- **组合**在 Hermes **bundle / cron prompt / 用户切换 slash**，不在 skill 内自动编排
+- **E 类编排例外**（如 weekly-report）须 PR 说明状态机/断点续跑理由
 
-## 基础铁律
+## 八大原则（摘要）
 
-- **单 Agent 闭环** — 禁止 `delegate_task`、禁止委派其他 skill
-- **渐进式加载** — `SKILL.md` 只路由；细节在 `modules/` / `references/`
-- **归档 `output/`** — gitignore；可配置路径
-- **平台脚手架** — `agents/` + `bundles/` + `openclaw-hermes-registration.md`
-- **CHANGELOG** — 技能级 + 根级 Keep a Changelog + SemVer
-- **凭据不入库** — 仅 `local/credentials.env.example`
+1. **原子技能** — 单一职责；窄触发词；验收只测本 skill
+2. **通用化** — 无平台路径、无 delegate_task、无硬编码人名路径
+3. **独立跑通** — 单 skill 可自检；不依赖其他 skill 运行时
+4. **开箱即用** — 默认值可跑；知识/data 自包含
+5. **参数化** — `*_config.py` + 环境变量
+6. **引导配置化** — 有凭据 → setup status/apply + onboarding
+7. **Emoji 化** — 报告输出类（B 类可豁免）
+8. **手机体验化** — 长报告 PDF（B 类可豁免；优先共享 render_mobile_pdf）
+
+## 单 Agent（澄清）
+
+- ✅ 同一 Agent 会话内**显式**组合多个原子 skill  
+- ❌ skill 内 `delegate_task` 或**自动**加载其他 skill  
+- ❌ 用一个大 skill 代替平台编排  
 
 ## 合并前必跑
 
 ```bash
 python3 scripts/validate_skill_scaffold.py
-python3 <skill>/scripts/run_acceptance.py   # 或 evaluation/run_evals.py
+python3 <skill>/scripts/run_acceptance.py
 ```
 
-## 参考技能
+## 参考
 
-`cross-cultural-consultant` · `aliyun-enterprise-mail` · `huazhirong-management-weekly-report` · `huazhirong-legal-affairs`
+- 原子工具：`aliyun-enterprise-mail`  
+- 领域知识：`cross-cultural-consultant`、`huazhirong-legal-affairs`  
+- 编排例外（勿模仿新建）：`huazhirong-management-weekly-report`
